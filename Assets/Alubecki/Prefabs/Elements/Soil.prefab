@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &7817979873307291683
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2527099351322128632, guid: 7d2db2b6b1d644006a573c605dad2092, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: -3392040664700520542, guid: 38f0ac04d24b14451a69318e539875a2, type: 3}
+    - target: {fileID: 3322058690142747475, guid: 7d2db2b6b1d644006a573c605dad2092, type: 3}
+      propertyPath: m_Name
+      value: Soil
+      objectReference: {fileID: 0}
+    - target: {fileID: 6992262463885153185, guid: 7d2db2b6b1d644006a573c605dad2092, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6992262463885153185, guid: 7d2db2b6b1d644006a573c605dad2092, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6992262463885153185, guid: 7d2db2b6b1d644006a573c605dad2092, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6992262463885153185, guid: 7d2db2b6b1d644006a573c605dad2092, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607618084323341480, guid: 7d2db2b6b1d644006a573c605dad2092, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 7d2db2b6b1d644006a573c605dad2092, type: 3}

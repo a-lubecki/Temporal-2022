@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2be7625bf66f443b2870a24f2b2935ea, type: 3}
+  m_Name: DataCharacter.C2
+  m_EditorClassIdentifier: 
+  <CharacterPrefab>k__BackingField: {fileID: -7421106753937211834, guid: 39f47f405bd694652aff13f5ebf1689a, type: 3}
+  <FullName>k__BackingField: Evo
+  <Description>k__BackingField: 
+  <SpeciesType>k__BackingField: 1
+  <Gender>k__BackingField: 1
+  <MaxAge>k__BackingField: 200
+  heightByAge:
+  - key: 0
+    value: 0
+  - key: 30
+    value: 1
+  weightByAge:
+  - key: 0
+    value: 0
+  - key: 1
+    value: 1
+  - key: 30
+    value: 3
+  agilityByAge:
+  - key: 0
+    value: 0
+  - key: 20
+    value: 1
+  - key: 40
+    value: 2
+  - key: 130
+    value: 1
+  - key: 170
+    value: 0
+  strongnessByAge:
+  - key: 0
+    value: 0
+  - key: 20
+    value: 3
+  - key: 80
+    value: 0
+  <AudioClipRotate>k__BackingField: {fileID: 8300000, guid: 293a4f66a92bd49cc97acf0ed4da3c4c, type: 3}
+  <AudioClipMove>k__BackingField: {fileID: 8300000, guid: 4dcba79ebbbbb4504928666b6f0c206c, type: 3}
+  <AudioClipClimb>k__BackingField: {fileID: 8300000, guid: d9275c39e911942cc96bce0b21325783, type: 3}
+  <AudioClipFall>k__BackingField: {fileID: 8300000, guid: 142b7c7f9044040d08999507fa633bbe, type: 3}
