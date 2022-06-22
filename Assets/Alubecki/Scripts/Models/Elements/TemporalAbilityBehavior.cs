@@ -9,7 +9,7 @@ public class TemporalAbilityBehavior : MonoBehaviour {
     [SerializeField] DataTemporalAbility temporalAbility;
 
     public DataTemporalAbility TemporalAbility => temporalAbility;
-    public string DisplayableText => "<b>Ability:</b> " + temporalAbility.AbilityName + "\n" + temporalAbility.AbilityDescription;
+    public string DisplayableText => "<b>Ability:</b> <u>" + temporalAbility.AbilityName + "</u>\n<size=80%>" + temporalAbility.AbilityDescription + "</size>";
 
 
     public void InitData(DataTemporalAbility temporalAbility) {

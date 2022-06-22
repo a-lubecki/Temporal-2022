@@ -35,7 +35,12 @@ public class BoardBehavior : MonoBehaviour {
             return false;
         }
 
-        var goLevel = GameObject.Instantiate(dataChapter.GetLevelPrefab(levelNumber), transform);
+        var levelPrefab = dataChapter.GetLevelPrefab(levelNumber);
+        if (levelPrefab == null) {
+            throw new ArgumentException("No level prefab for level " + levelNumber);
+        }
+
+        var goLevel = GameObject.Instantiate(levelPrefab, transform);
 
         CurrentLevel = goLevel.AddComponent<LevelBehavior>();
         CurrentLevel.InitLevel(dataChapter, levelNumber);
@@ -92,15 +97,19 @@ public class BoardBehavior : MonoBehaviour {
         return IsInsideBoardHorizontalLimits(new Vector2(pos.x, pos.z));
     }
 
+    public bool IsAnyWalkableElementUnderPos(Vector3 pos) {
+        return GetElemsUnderPos(pos).Any(e => e.IsPhysicallyWalkableOverBlock);
+    }
+
     public bool IsWalkablePos(Vector3 pos) {
 
-        if (GetElemsOnPos(pos).Any(e => e.ColliderHeight > 0)) {
+        if (GetElemsOnPos(pos).Any(e => !e.IsPhysicallyWalkableInBlock)) {
             //must not have something on pos to walk on it
             return false;
         }
 
         //must have something under pos to walk on it
-        return GetElemsUnderPos(pos).Any(e => e.IsWalkableOn);
+        return IsAnyWalkableElementUnderPos(pos);
     }
 
     public bool HasElemOnPos(Vector3 pos) {
@@ -110,7 +119,8 @@ public class BoardBehavior : MonoBehaviour {
     public IEnumerable<BaseElementBehavior> GetElemsOnPos(Vector3 pos) {
 
         var y = (int)pos.y;
-        return GetElements().Where(e => e.IsOnGridPile(pos) && e.GridPosY <= y && y < e.GridPosY + e.ColliderHeight);
+        return GetElements()
+            .Where(e => e.IsOnGridPile(pos) && e.GridPosY <= y && (e.ColliderHeight <= 0 || y < e.GridPosY + e.ColliderHeight));
     }
 
     public bool HasElemUnderPos(Vector3 pos) {
@@ -134,7 +144,7 @@ public class BoardBehavior : MonoBehaviour {
         var height = 0;
         var y = elem.GridPosY;
 
-        while (y > POS_Y_GROUND && !HasElemUnderPos(new Vector3(elem.GridPosX, y, elem.GridPosZ))) {
+        while (y > POS_Y_GROUND && !IsAnyWalkableElementUnderPos(new Vector3(elem.GridPosX, y, elem.GridPosZ))) {
 
             y--;
             height++;
@@ -144,6 +154,9 @@ public class BoardBehavior : MonoBehaviour {
     }
 
     public IEnumerable<BaseElementBehavior> GetAboutToFallElements() {
-        return GetElements().Where(e => e.CanFall && !HasElemUnderPos(e.GridPos));
+
+        return GetElements()
+            .Where(e => e.CanFall && !IsAnyWalkableElementUnderPos(e.GridPos));
     }
+
 }

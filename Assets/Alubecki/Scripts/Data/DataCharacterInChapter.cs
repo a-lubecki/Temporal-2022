@@ -5,7 +5,7 @@ using UnityEngine;
 public class DataCharacterInChapter : ScriptableObject {
 
     [field: SerializeField] public DataCharacter DataCharacter { get; protected set; }
-
+    [field: SerializeField] public bool IsUnknown { get; protected set; }
     [field: SerializeField] public int InitialAge { get; protected set; }
     [field: SerializeField] public Team Team { get; protected set; }
     [field: SerializeField] public DataTemporalAbility Ability { get; protected set; }

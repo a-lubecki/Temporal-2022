@@ -15,4 +15,4 @@ MonoBehaviour:
   <AbilityName>k__BackingField: +20
   <AbilityDescription>k__BackingField: The environment is getting older by 20 years.
   <AgeShiftYears>k__BackingField: 20
-  <ZoneMaterial>k__BackingField: {fileID: 2100000, guid: 4e232cc0d6ae04ee7a670d65d1040fe0, type: 2}
+  <ZoneColor>k__BackingField: {r: 0.8867924, g: 0.29699183, b: 0.29699183, a: 0.5019608}

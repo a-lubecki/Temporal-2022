@@ -31,7 +31,7 @@ public abstract class BaseControlsBehavior : MonoBehaviour {
 
         playerInput.SwitchCurrentActionMap(CurrentActionMapName);
 
-        Debug.Log("Selected action map : " + CurrentActionMapName);
+        //Debug.Log("Selected action map : " + CurrentActionMapName);
     }
 
     public void DisableControls() {
@@ -40,14 +40,14 @@ public abstract class BaseControlsBehavior : MonoBehaviour {
 
         playerInput.actions.Disable();
 
-        Debug.Log("Disabled controls");
+        //Debug.Log("Disabled controls");
     }
 
     public void EnableControls() {
 
         playerInput.actions.Enable();
 
-        Debug.Log("Enable controls");
+        //Debug.Log("Enable controls");
     }
 
     public void DisableControlsForSeconds(float timeSec) {

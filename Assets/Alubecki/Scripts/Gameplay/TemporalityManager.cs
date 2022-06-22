@@ -10,6 +10,9 @@ public class TemporalityManager : MonoBehaviour {
     public const float DURATION_ANIM_FROM_AGE_TO_AGE_SEC = 0.2f;
 
 
+    Dictionary<BaseElementBehavior, int> agesBeforeResolve = new Dictionary<BaseElementBehavior, int>();
+
+
     public void InitZones() {
 
         DeleteZones();
@@ -39,35 +42,77 @@ public class TemporalityManager : MonoBehaviour {
         var zones = GetZones();
         var agedElements = Game.Instance.boardBehavior.GetElements().Where(e => e.TryGetComponent<AgeBehavior>(out _));
 
+        agesBeforeResolve.Clear();
+
         foreach (var elem in agedElements) {
 
-            var totalAgeShiftYears = 0;
+            var previousAge = elem.GetComponent<AgeBehavior>().PreviousAge;
 
-            //get influence of all zones
-            foreach (var zone in zones) {
+            if (ResolveTemporalityForElement(elem, zones, true)) {
 
-                if (zone.IsOwner(elem)) {
-                    //the character is not impacted by its zone
-                    continue;
-                }
-
-                if (zone.ContainsElement(elem)) {
-                    totalAgeShiftYears += zone.AgeShiftYears;
-                }
-            }
-
-            var ageBehavior = elem.GetComponent<AgeBehavior>();
-            var changed = ageBehavior.SetAgeShift(totalAgeShiftYears, true, DURATION_ANIM_FROM_AGE_TO_AGE_SEC);
-            if (changed) {
                 isAnimatingZones = true;
 
-                PushElementsAboveIfNecessary(elem, ageBehavior);
+                //only retain age if temporality was resolved (this dictionary is used t resolve paradoxes in case age changed)
+                agesBeforeResolve.Add(elem, previousAge);
             }
         }
 
         if (isAnimatingZones) {
             yield return new WaitForSeconds(DURATION_ANIM_FROM_AGE_TO_AGE_SEC + 0.1f);
         }
+    }
+
+    public void ResolveParadoxes() {
+
+        var zones = GetZones();
+
+        //resolve paradoxes
+        foreach (var e in agesBeforeResolve) {
+
+            var elem = e.Key;
+            var previousAge = e.Value;
+
+            var ageBehavior = elem.GetComponent<AgeBehavior>();
+
+            if (previousAge != ageBehavior.CurrentAge) {
+
+                //reset the previous age because it has been replaced by the current age after the animation
+                //previous age is needed by the algorithm in AgeParadoxBehavior
+                ageBehavior.OverridePreviousAge(previousAge);
+
+                //if nothing changed after the next resolve, the elem is in paradox state, it won't be animated as it's in the previous age
+                ResolveTemporalityForElement(elem, zones, false);
+            }
+        }
+    }
+
+    bool ResolveTemporalityForElement(BaseElementBehavior elem, IEnumerable<TemporalZoneBehavior> zones, bool animated) {
+
+        var totalAgeShift = 0;
+
+        //get influence of all zones on elem
+        foreach (var zone in zones) {
+
+            if (zone.IsOwner(elem)) {
+                //the character is not impacted by its own zone
+                continue;
+            }
+
+            if (zone.ContainsElement(elem)) {
+                totalAgeShift += zone.AgeShiftYears;
+            }
+        }
+
+        var ageBehavior = elem.GetComponent<AgeBehavior>();
+
+        //change age
+        var changed = ageBehavior.SetCurrentAge(ageBehavior.RealAge + totalAgeShift, animated, DURATION_ANIM_FROM_AGE_TO_AGE_SEC);
+        if (changed) {
+            PushElementsAboveIfNecessary(elem, ageBehavior);
+            return true;
+        }
+
+        return false;
     }
 
     void PushElementsAboveIfNecessary(BaseElementBehavior elem, AgeBehavior ageBehavior) {

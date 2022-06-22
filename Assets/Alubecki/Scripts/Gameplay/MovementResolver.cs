@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 
@@ -16,6 +18,10 @@ public class MovementResolver : MonoBehaviour {
     }
 
     public void ResolveCurrentMovement() {
+
+        if (IsResolvingMovement) {
+            throw new InvalidOperationException("Already resolving movement");
+        }
 
         IsResolvingMovement = true;
 
@@ -47,56 +53,66 @@ public class MovementResolver : MonoBehaviour {
 
     IEnumerator ResolveMovementConsequences(Action onComplete) {
 
-        yield return ResolveGravity();
+        yield return ResolveTemporalityAndGravity();
 
-        yield return Game.Instance.temporalityManager.ResolveTemporality();
+        yield return ResolveNPCMovements();
 
-        yield return ResolveGravity();
+        if (IsAnyPlayerCharacterDefinitelyDead()) {
 
-        var nextNPCMovement = GetNextNPCMovement();
-        if (nextNPCMovement == null) {
-            onComplete();
+            Game.Instance.gameManager.TriggerEnd(true);
+            onComplete?.Invoke();
+
             yield break;
         }
 
-        //free the movement to get anothe NPC movement to execute next time
-        ClearNPCMovement(nextNPCMovement);
+        if (AreAllPlayerCharactersOnGoals()) {
 
-        //execute movement and convert execute callback in "coroutine wait" to stay in curent coroutine
-        var isMovementExecuted = false;
-        nextNPCMovement.Execute(() => isMovementExecuted = true);
+            Game.Instance.gameManager.TriggerEnd(false);
+            onComplete?.Invoke();
 
-        yield return new WaitUntil(() => isMovementExecuted);
-
-        //resolve attacks, it can lead to game over
-        while (IsRemainingAnyNPCAttack()) {
-
-            yield return ResolveNextNPCAttack();
-
-            if (IsAnyPlayerCharacterDefinitelyDead()) {
-
-                Game.Instance.gameManager.TriggerEnd(true);
-                onComplete();
-
-                yield break;
-            }
+            yield break;
         }
-
-        //continue resolving until there are no remaining NPC to move
-        yield return ResolveMovementConsequences(onComplete);
 
         DisplayAllNextNPCMovements();
 
-        onComplete();
+        onComplete?.Invoke();
+    }
+/*
+    IEnumerator ResolveTemporalityAndGravity() {
+
+        var aboutToFallElements = Game.Instance.boardBehavior.GetAboutToFallElements();
+
+        do {
+
+            yield return ResolveGravity(aboutToFallElements);
+
+            yield return Game.Instance.temporalityManager.ResolveTemporality();
+
+            aboutToFallElements = Game.Instance.boardBehavior.GetAboutToFallElements();
+
+        } while (aboutToFallElements.Count() > 0);
+
+        Game.Instance.temporalityManager.ResolveParadoxes();
+    }
+*/
+    IEnumerator ResolveTemporalityAndGravity() {
+
+        yield return ResolveGravity(Game.Instance.boardBehavior.GetAboutToFallElements());
+
+        yield return Game.Instance.temporalityManager.ResolveTemporality();
+
+        yield return ResolveGravity(Game.Instance.boardBehavior.GetAboutToFallElements());
+
+        Game.Instance.temporalityManager.ResolveParadoxes();
     }
 
-    IEnumerator ResolveGravity() {
+    IEnumerator ResolveGravity(IEnumerable<BaseElementBehavior> aboutToFallElements) {
 
         var board = Game.Instance.boardBehavior;
 
         var fallingElemsCount = 0;
 
-        foreach (var elem in board.GetAboutToFallElements()) {
+        foreach (var elem in aboutToFallElements) {
 
             var fallHeight = board.GetFallHeight(elem);
             var durationSec = 0.4f * fallHeight;
@@ -113,6 +129,43 @@ public class MovementResolver : MonoBehaviour {
 
         yield return new WaitWhile(() => fallingElemsCount > 0);
         yield return new WaitForSeconds(0.01f);
+    }
+
+    IEnumerator ResolveNPCMovements() {
+
+        var nextNPCMovement = GetNextNPCMovement();
+
+        while (nextNPCMovement != null) {
+
+            //free the movement to get anothe NPC movement to execute next time
+            ClearNPCMovement(nextNPCMovement);
+
+            //execute movement and convert execute callback in "coroutine wait" to stay in curent coroutine
+            var isMovementExecuted = false;
+            nextNPCMovement.Execute(() => isMovementExecuted = true);
+
+            yield return new WaitUntil(() => isMovementExecuted);
+
+            yield return ResolveTemporalityAndGravity();
+
+            if (IsAnyPlayerCharacterDefinitelyDead()) {
+                //stop now, game over will be triggered outside this method
+                yield break;
+            }
+
+            //resolve attacks, it can lead to game over
+            while (IsRemainingAnyNPCAttack()) {
+
+                yield return ResolveNextNPCAttack();
+
+                if (IsAnyPlayerCharacterDefinitelyDead()) {
+                    //stop now, game over will be triggered outside this method
+                    yield break;
+                }
+            }
+
+            nextNPCMovement = GetNextNPCMovement();
+        }
     }
 
     BaseMovement GetNextNPCMovement() {
@@ -133,7 +186,22 @@ public class MovementResolver : MonoBehaviour {
     }
 
     bool IsAnyPlayerCharacterDefinitelyDead() {
-        return false;//TODO
+
+        return Game.Instance.boardBehavior.GetElements()
+            .Any(e => e.TryGetComponent<CharacterBehavior>(out var character) && character.IsPlayable && character.IsDefinitelyDead);
+    }
+
+    bool AreAllPlayerCharactersOnGoals() {
+
+        return Game.Instance.boardBehavior.GetElements()
+            .Where(e => e.TryGetComponent<CharacterBehavior>(out var character) && character.IsPlayable && character.IsAlive)
+            .All(e => IsGoalOnPos(e.GridPos));
+    }
+
+    bool IsGoalOnPos(Vector3 pos) {
+
+        return Game.Instance.boardBehavior.GetElemsOnPos(pos)
+            .Any(e => e.TryGetComponent<GoalBehavior>(out _));
     }
 
     void DisplayAllNextNPCMovements() {

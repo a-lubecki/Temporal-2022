@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Linq;
 using UnityEngine;
 
@@ -9,7 +10,13 @@ public class GameManager : MonoBehaviour {
     [SerializeField] DataChapter dataChapter;
     [SerializeField] int nextLevelNumberToLoad = 1;
 
-    public bool IsFirstLevelOfChapter => Game.Instance.boardBehavior.CurrentLevel?.IsFirstLevelOfChapter ?? false;
+    [SerializeField] AudioClip audioClipWin;
+    [SerializeField] AudioClip audioClipGameOverAmbience;
+
+    public bool IsLevelLoaded => CurrentLevel != null;
+    public LevelBehavior CurrentLevel => Game.Instance.boardBehavior.CurrentLevel;
+    public int CurrentLevelNumber => CurrentLevel.LevelNumber;
+    public bool IsFirstLevelOfChapter => CurrentLevel?.IsFirstLevelOfChapter ?? false;
     public bool IsLevelAnimating { get; private set; }
     public bool IsLevelShown { get; private set; }
     public bool IsLevelReadyToPlay => IsLevelShown && !IsLevelAnimating;
@@ -21,6 +28,7 @@ public class GameManager : MonoBehaviour {
     public bool IsResolvingMovement => Game.Instance.movementResolver.IsResolvingMovement;
     public bool IsGameOver { get; private set; }
     public bool IsWin { get; private set; }
+    public bool MustStartNextLevel => Game.Instance.panelWin.MustStartNextLevel;
 
 
     public void Start() {
@@ -35,6 +43,9 @@ public class GameManager : MonoBehaviour {
         Game.Instance.cursorSelectedBehavior.Hide();
         Game.Instance.boardBehavior.Hide();
 
+        Game.Instance.panelPileBehavior.Hide();
+        Game.Instance.panelLevelInfo.Hide();
+        Game.Instance.panelWin.Hide();
         Game.Instance.viewGameOverBehavior.Hide();
     }
 
@@ -46,11 +57,18 @@ public class GameManager : MonoBehaviour {
     public void TriggerEnd(bool isGameOver) {
 
         if (IsGameOver) {
+
             IsGameOver = true;
             IsWin = false;
+
+            Debug.Log("END: GAME OVER");
+
         } else {
+
             IsGameOver = false;
             IsWin = true;
+
+            Debug.Log("END: WIN");
         }
     }
 
@@ -78,6 +96,9 @@ public class GameManager : MonoBehaviour {
 
         Game.Instance.elementsSelectionBehavior.CancelSelection();
 
+        //hide the board to avoid seeing the loaded level before its animation
+        Game.Instance.boardBehavior.Hide();
+
         var loaded = Game.Instance.boardBehavior.LoadNewLevel(dataChapter, nextLevelNumberToLoad);
         if (!loaded) {
             throw new NotSupportedException("Level " + nextLevelNumberToLoad + " found to play => end of chapter ?");
@@ -85,6 +106,8 @@ public class GameManager : MonoBehaviour {
 
         //prepare next level for after
         nextLevelNumberToLoad++;
+
+        Game.Instance.panelLevelInfo.Show(dataChapter.ChapterName, CurrentLevelNumber);
     }
 
     public void OnAnimateLevelShowBegin() {
@@ -96,24 +119,27 @@ public class GameManager : MonoBehaviour {
 
         Game.Instance.levelAnimator.AnimateLevelShow(
             Game.Instance.boardBehavior.transform,
-            Game.Instance.boardBehavior.CurrentLevel.transform,
-            () => IsLevelAnimating = false
+            CurrentLevel.transform,
+            () => {
+
+                Game.Instance.temporalityManager.InitZones();
+
+                //hide the previous level story text
+                Game.Instance.panelWin.Hide();
+
+                Game.Instance.movementResolver.InitLevel(() => IsLevelAnimating = false);
+            }
         );
     }
 
     public void OnAnimateLevelShowEnd() {
 
-        Game.Instance.temporalityManager.InitZones();
-
-        Game.Instance.movementResolver.InitLevel(() => {
-
-            Game.Instance.inGameControlsBehavior.EnableControlsAfterDelay(0.1f);
-        });
+        Game.Instance.inGameControlsBehavior.EnableControlsAfterDelay(0.1f);
     }
 
     public void OnSelectionStepBegin() {
 
-        Debug.Log(">> STEP selection");
+        //Debug.Log(">> STEP selection");
 
         Game.Instance.selectionStepManager.enabled = true;
 
@@ -143,7 +169,7 @@ public class GameManager : MonoBehaviour {
 
     public void OnMovementStepBegin() {
 
-        Debug.Log(">> STEP movement");
+        //Debug.Log(">> STEP movement");
 
         Game.Instance.movementStepManager.enabled = true;
 
@@ -169,7 +195,7 @@ public class GameManager : MonoBehaviour {
 
     public void OnMovementResolveBegin() {
 
-        Debug.Log(">> Resolve movement");
+        //Debug.Log(">> Resolve movement");
 
         Game.Instance.inGameControlsBehavior.DisableControls();
 
@@ -187,20 +213,40 @@ public class GameManager : MonoBehaviour {
 
     public void OnAnimateLevelHideBegin() {
 
+        Game.Instance.panelPileBehavior.Hide();
+        Game.Instance.elementsSelectionBehavior.CancelSelection();
         Game.Instance.inGameControlsBehavior.DisableControls();
 
         IsLevelAnimating = true;
 
+        Game.Instance.audioManager.PlaySimpleSound(audioClipWin);
+
+        StartCoroutine(AnimateLevelHideAfterDelay());
+    }
+
+    IEnumerator AnimateLevelHideAfterDelay() {
+
+        yield return new WaitForSeconds(0.5f);
+
+        Game.Instance.mainCameraController.ResetRotationAndZoom();
+
+        yield return new WaitForSeconds(2);
+
         Game.Instance.levelAnimator.AnimateLevelHide(
             Game.Instance.boardBehavior.transform,
-            Game.Instance.boardBehavior.CurrentLevel.transform,
+            CurrentLevel.transform,
             () => IsLevelAnimating = false
         );
 
         Game.Instance.temporalityManager.DeleteZones();
         Game.Instance.cursorBehavior.Hide();
 
-        //TODO reveal text under level + move camera
+        Game.Instance.panelWin.Show(CurrentLevel.TextStory);
+
+        yield return new WaitForSeconds(0.8f);
+
+        //switch to the camera aiming the panel
+        Game.Instance.vcamWin.Priority = 100;
     }
 
     public void OnAnimateLevelHideEnd() {
@@ -214,7 +260,11 @@ public class GameManager : MonoBehaviour {
     public void OnLevelFinish() {
 
         Game.Instance.boardBehavior.UnloadCurrentLevel();
-        Game.Instance.boardBehavior.Hide();
+
+        Game.Instance.panelLevelInfo.Hide();
+
+        //reset win camera of the previous level to move to the main dolly camera
+        Game.Instance.vcamWin.Priority = 0;
     }
 
     public void OnGameOverStart() {
@@ -223,12 +273,17 @@ public class GameManager : MonoBehaviour {
 
         Game.Instance.viewGameOverBehavior.Show();
 
+        CurrentLevel.StopMusic();
+        Game.Instance.audioManager.PlayAmbience(audioClipGameOverAmbience);
+
         //TODO only enable "cancel previous movement" control
     }
 
     public void OnGameOverFinish() {
 
         IsGameOver = false;
+
+        CurrentLevel.PlayMusic();
 
         Game.Instance.viewGameOverBehavior.Hide();
     }

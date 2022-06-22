@@ -32,13 +32,13 @@ public class CameraController : MonoBehaviour {
         var c = Game.Instance.inGameControlsBehavior;
 
         if (c.MustRotateCameraLeft) {
-            rotateLeft();
+            RotateLeft();
         } else if (c.MustRotateCameraRight) {
-            rotateRight();
+            RotateRight();
         } else if (c.MustDezoom) {
-            dezoom();
+            Dezoom();
         } else if (c.MustZoom) {
-            zoom();
+            Zoom();
         }
     }
 
@@ -68,7 +68,13 @@ public class CameraController : MonoBehaviour {
         trCamLookAt.transform.position = selectedElem?.transform.position ?? Vector3.zero;
     }
 
-    void rotateLeft() {
+    public void ResetRotationAndZoom() {
+
+        horizontalPosition = HorizontalPosition.SW;
+        zoomLevel = ZoomLevel.DEFAULT;
+    }
+
+    void RotateLeft() {
 
         Game.Instance.inGameControlsBehavior.DisableControlsForSeconds(DELAY_BETWEEN_MOVES_SEC);
 
@@ -81,7 +87,7 @@ public class CameraController : MonoBehaviour {
         };
     }
 
-    void rotateRight() {
+    void RotateRight() {
 
         Game.Instance.inGameControlsBehavior.DisableControlsForSeconds(DELAY_BETWEEN_MOVES_SEC);
 
@@ -94,7 +100,7 @@ public class CameraController : MonoBehaviour {
         };
     }
 
-    void dezoom() {
+    void Dezoom() {
 
         Game.Instance.inGameControlsBehavior.DisableControlsForSeconds(DELAY_BETWEEN_MOVES_SEC);
 
@@ -105,7 +111,7 @@ public class CameraController : MonoBehaviour {
         };
     }
 
-    void zoom() {
+    void Zoom() {
 
         Game.Instance.inGameControlsBehavior.DisableControlsForSeconds(DELAY_BETWEEN_MOVES_SEC);
 
@@ -136,8 +142,8 @@ public class CameraController : MonoBehaviour {
     public float GetDollyTrackSize() => zoomLevel switch {
 
         ZoomLevel.CLOSE => 0.6f,
-        ZoomLevel.DEFAULT => 1,
-        ZoomLevel.FAR => 0.6f,
+        ZoomLevel.DEFAULT => 0.8f,
+        ZoomLevel.FAR => 0.5f,
         _ => throw new NotImplementedException()
     };
 

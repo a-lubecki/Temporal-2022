@@ -37,6 +37,7 @@ public class PanelPileBehavior : MonoBehaviour {
             panelElem.UpdateUI(elem.DisplayableCharacteristics);
         }
 
+        //force update panel to avoid resizing bugs
         LayoutRebuilder.MarkLayoutForRebuild(transform as RectTransform);
     }
 

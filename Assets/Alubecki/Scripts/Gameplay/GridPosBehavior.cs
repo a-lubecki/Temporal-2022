@@ -13,6 +13,10 @@ public class GridPosBehavior : MonoBehaviour {
     public int GridPosY => GridPos.y;
     public int GridPosZ => GridPos.z;
 
+    protected virtual void Start() {
+        //align elem with grid
+        transform.localPosition = GridPos;
+    }
 
     public bool IsOriented(Orientation nextOrientation) {
         return Orientation == nextOrientation;

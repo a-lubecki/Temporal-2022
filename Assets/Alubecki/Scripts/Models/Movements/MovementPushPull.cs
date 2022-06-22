@@ -121,7 +121,8 @@ public class MovementPushPull : BaseMovement {
 
             //only check if an object is already behind the movable object
             //don't check if there is something under because the object can fall, except for limits
-            if (board.IsInsideBoardHorizontalLimits(posMovableObjectAfterPush) && !board.HasElemOnPos(posMovableObjectAfterPush)) {
+            if (board.IsInsideBoardHorizontalLimits(posMovableObjectAfterPush) &&
+                (!board.HasElemOnPos(posMovableObjectAfterPush) || board.IsWalkablePos(posMovableObjectAfterPush))) {
                 res.Add(movableObject.GridPos);
             }
 

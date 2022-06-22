@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <CharacterPrefab>k__BackingField: {fileID: -7421106753937211834, guid: 39f47f405bd694652aff13f5ebf1689a, type: 3}
   <FullName>k__BackingField: Evo
-  <Description>k__BackingField: 
+  <Description>k__BackingField: He ran from other extraterrestrials 20 years ago
+    and he's doing the same now.
   <SpeciesType>k__BackingField: 1
   <Gender>k__BackingField: 1
   <MaxAge>k__BackingField: 200

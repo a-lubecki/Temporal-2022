@@ -54,7 +54,7 @@ public class ElementsSelectionBehavior : MonoBehaviour {
         Game.Instance.panelPileBehavior.Show(currentPile);
 
         if (mustPlaySound) {
-            Game.Instance.audioSourceGlobalSounds.PlayOneShot(audioClipCursorMove);
+            Game.Instance.audioManager.PlaySimpleSound(audioClipCursorMove);
         }
     }
 
@@ -94,11 +94,8 @@ public class ElementsSelectionBehavior : MonoBehaviour {
         //play select or deselect audio
         if (canPlaySound && SelectedElement != LastSelectedElement) {
             var clip = SelectedElement != null ? audioClipSelect : audioClipDeselect;
-            Game.Instance.audioSourceGlobalSounds.PlayOneShot(clip);
+            Game.Instance.audioManager.PlaySimpleSound(clip);
         }
-
-        //update cursor
-        NavigateCursorOnPileOfElement(SelectedElement, false);
     }
 
     public void CancelSelection(bool canPlaySound = true) {

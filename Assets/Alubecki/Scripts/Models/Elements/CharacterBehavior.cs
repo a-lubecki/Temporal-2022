@@ -24,8 +24,8 @@ public class CharacterBehavior : BaseElementBehavior {
     LifeStatus lifeStatus;
 
 
-    public string FullName => dataCharacterInChapter.DataCharacter.FullName;
-    public string Description => dataCharacterInChapter.DataCharacter.Description;
+    public string FullName => dataCharacterInChapter.IsUnknown ? "(unknown)" : dataCharacterInChapter.DataCharacter.FullName;
+    public string Description => dataCharacterInChapter.IsUnknown ? "" : "<size=80%>" + dataCharacterInChapter.DataCharacter.Description + "</size>";
     public Team Team => dataCharacterInChapter.Team;
     public SpeciesType SpeciesType => dataCharacterInChapter.DataCharacter.SpeciesType;
     public Gender Gender => dataCharacterInChapter.DataCharacter.Gender;
@@ -36,23 +36,26 @@ public class CharacterBehavior : BaseElementBehavior {
 
     public override bool IsCursorAboveElement => false;
     public override bool CanBeSelected => Team == Team.ALLY;
-    public override bool IsWalkableOn => false;
-    public override bool CanMove => lifeStatus == LifeStatus.ALIVE && !IsGrabbing;
+    public override bool IsPhysicallyWalkableOverBlock => false;
+    public override bool CanMove => IsAlive && !IsGrabbing;
     public override bool CanFall => true;
-
-    public bool CanDoAction => lifeStatus == LifeStatus.ALIVE;
-    public bool CanClimb => CanDoAction && agility == Agility.AGILE || agility == Agility.VERY_AGILE;
+    public bool CanDoAction => IsAlive && !IsGrabbing;
+    public bool CanClimb => CanDoAction && (agility == Agility.AGILE || agility == Agility.VERY_AGILE);
     public bool CanJumpHigh => CanDoAction && agility == Agility.VERY_AGILE;
 
     public MovableObjectBehavior GrabbedMovableObject { get; private set; }
     public bool CanGrab => CanDoAction && GrabbedMovableObject == null;
     public bool IsGrabbing => GrabbedMovableObject != null;
-    public bool CanPushOrPull => CanDoAction && IsGrabbing;
+    public bool CanPushOrPull => IsAlive && IsGrabbing;
 
     public bool IsPlayable => Team == Team.ALLY;
     public bool IsNPC => Team != Team.ALLY;
     public bool IsEnemy => Team == Team.ENEMY;
     public bool IsNeutral => Team == Team.NEUTRAL;
+
+    public bool IsAlive => lifeStatus == LifeStatus.ALIVE;
+    public bool IsDead => lifeStatus == LifeStatus.CORPSE || lifeStatus == LifeStatus.DEFINITELY_DEAD;
+    public bool IsDefinitelyDead => lifeStatus == LifeStatus.DEFINITELY_DEAD;
 
     protected override BaseMovement.Factory[] PossibleMovements => new BaseMovement.Factory[] {
         new MovementSimpleMove.Factory(),
@@ -65,7 +68,7 @@ public class CharacterBehavior : BaseElementBehavior {
 
     public override DisplayableCharacteristics DisplayableCharacteristics => new DisplayableCharacteristics(
         GetDisplayableColor(),
-        dataCharacterInChapter.DataCharacter.FullName,
+        FullName,
         GetTextCharacteristics()
     );
 
@@ -261,7 +264,7 @@ public class CharacterBehavior : BaseElementBehavior {
             return false;
         }
 
-        Game.Instance.audioSourceGlobalSounds.PlayOneShot(AudioClipRotate);
+        Game.Instance.audioManager.PlaySimpleSound(AudioClipRotate);
 
         return true;
     }
@@ -272,7 +275,7 @@ public class CharacterBehavior : BaseElementBehavior {
             return false;
         }
 
-        Game.Instance.audioSourceGlobalSounds.PlayOneShot(AudioClipMove);
+        Game.Instance.audioManager.PlaySimpleSound(AudioClipMove);
 
         return true;
     }
@@ -283,7 +286,7 @@ public class CharacterBehavior : BaseElementBehavior {
             return false;
         }
 
-        Game.Instance.audioSourceGlobalSounds.PlayOneShot(AudioClipClimb);
+        Game.Instance.audioManager.PlaySimpleSound(AudioClipClimb);
 
         return true;
     }
@@ -297,7 +300,7 @@ public class CharacterBehavior : BaseElementBehavior {
         DOTween.Sequence()
             .AppendInterval(durationSec)
             .AppendCallback(() => {
-                Game.Instance.audioSourceGlobalSounds.PlayOneShot(AudioClipFall);
+                Game.Instance.audioManager.PlaySimpleSound(AudioClipFall);
             });
 
         return true;
@@ -315,8 +318,20 @@ public class CharacterBehavior : BaseElementBehavior {
         DOTween.Sequence()
             .AppendInterval(0.4f * durationSec)
             .AppendCallback(() => {
-                Game.Instance.audioSourceGlobalSounds.PlayOneShot(AudioClipFall);
+                Game.Instance.audioManager.PlaySimpleSound(AudioClipFall);
             });
+
+        return true;
+    }
+
+    public override bool TryMoveUp(int height, float durationSec, Action onComplete = null) {
+
+        if (!base.TryMoveUp(height, durationSec, onComplete)) {
+            return false;
+        }
+
+        //auto release
+        ReleaseMovableObject(true);
 
         return true;
     }
@@ -340,7 +355,7 @@ public class CharacterBehavior : BaseElementBehavior {
                 .OnComplete(() => onComplete.Invoke());
         }
 
-        Game.Instance.audioSourceGlobalSounds.PlayOneShot(AudioClipMove);
+        Game.Instance.audioManager.PlaySimpleSound(AudioClipMove);
     }
 
 }

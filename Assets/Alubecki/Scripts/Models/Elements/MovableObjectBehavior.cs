@@ -65,7 +65,7 @@ public class MovableObjectBehavior : BaseElementBehavior {
             return false;
         }
 
-        Game.Instance.audioSourceGlobalSounds.PlayOneShot(audioClipMove);
+        Game.Instance.audioManager.PlaySimpleSound(audioClipMove);
 
         return true;
     }
@@ -82,8 +82,20 @@ public class MovableObjectBehavior : BaseElementBehavior {
         DOTween.Sequence()
             .AppendInterval(0.4f * durationSec)
             .AppendCallback(() => {
-                Game.Instance.audioSourceGlobalSounds.PlayOneShot(audioClipFall);
+                Game.Instance.audioManager.PlaySimpleSound(audioClipFall);
             });
+
+        return true;
+    }
+
+    public override bool TryMoveUp(int height, float durationSec, Action onComplete = null) {
+
+        if (!base.TryMoveUp(height, durationSec, onComplete)) {
+            return false;
+        }
+
+        //auto release
+        GrabbedCharacter?.ReleaseMovableObject(true);
 
         return true;
     }

@@ -1,3 +1,4 @@
+using Cinemachine;
 using Lean.Pool;
 using UnityEngine;
 
@@ -15,6 +16,9 @@ public class Game : MonoBehaviourSingleton<Game> {
     public MovementsSelectionBehavior movementsSelectionBehavior;
     public MovementResolver movementResolver;
 
+    public CameraController mainCameraController;
+    public CinemachineVirtualCamera vcamWin;
+
     public LeanGameObjectPool poolIndicationCharacterMove;
     public LeanGameObjectPool poolIndicationMovableObjectMove;
     public LeanGameObjectPool poolIndicationNPCAction;
@@ -30,10 +34,12 @@ public class Game : MonoBehaviourSingleton<Game> {
     public BoardBehavior boardBehavior;
 
     public Canvas canvas;
+    public PanelLevelInfo panelLevelInfo;
     public PanelPileBehavior panelPileBehavior;
+    public PanelWin panelWin;
     public ViewGameOverBehavior viewGameOverBehavior;
 
-    public AudioSource audioSourceGlobalSounds;
+    public AudioManager audioManager;
 
 
 }

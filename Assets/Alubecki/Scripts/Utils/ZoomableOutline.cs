@@ -11,8 +11,8 @@ public class ZoomableOutline : Outline {
 
     [SerializeField] float constantOutlineWidth = 1;
 
-    private float lastThicknessMultiplier = 1;
-    private float lastConstantOutlineWidth = 1;
+    private float lastThicknessMultiplier = -1;
+    private float lastConstantOutlineWidth = -1;
 
 
     void LateUpdate() {

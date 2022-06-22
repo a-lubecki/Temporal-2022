@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: DataCharacter.C1
   m_EditorClassIdentifier: 
   <CharacterPrefab>k__BackingField: {fileID: -7421106753937211834, guid: 39f47f405bd694652aff13f5ebf1689a, type: 3}
-  <FullName>k__BackingField: Jack
-  <Description>k__BackingField: 
+  <FullName>k__BackingField: Ethan
+  <Description>k__BackingField: 20 years ago, he saw armed extraterrestrials getting
+    out of a whormole. Since then, he want to know what happened.
   <SpeciesType>k__BackingField: 0
   <Gender>k__BackingField: 1
   <MaxAge>k__BackingField: 100

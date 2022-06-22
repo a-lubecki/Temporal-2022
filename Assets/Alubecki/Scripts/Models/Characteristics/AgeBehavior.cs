@@ -5,10 +5,15 @@ using System.Linq;
 using UnityEngine;
 
 
+[DisallowMultipleComponent]
 public class AgeBehavior : MonoBehaviour {
 
 
-    public const string GO_NAME_MESHES = "AgedMeshes";
+    //steps between ages must be 20 years, for example : [10, 30, 50] or [0, 20, 40]
+    public const float AGE_STEPS_IN_YEARS = 20;
+    public const float HALF_AGE_STEPS_IN_YEARS = AGE_STEPS_IN_YEARS / 2f;
+
+    public const string GO_NAME_AGED_MESHES = "AgedMeshes";
     const float ANIM_PERIOD_SEC = 0.02f;
 
 
@@ -19,6 +24,7 @@ public class AgeBehavior : MonoBehaviour {
     readonly Dictionary<AgeBounds, GameObject> meshesByAgeBounds = new Dictionary<AgeBounds, GameObject>();
     Coroutine coroutineAnimateAgeChanges;
 
+    public int RealAge => realAge;
     public int CurrentAge => currentAge;
     public int PreviousAge { get; private set; }
     public bool DidAgeChange => currentAge != PreviousAge;
@@ -27,31 +33,40 @@ public class AgeBehavior : MonoBehaviour {
     public string DisplayableText => "<b>Age:</b> " + currentAge;
 
 
-    void Awake() {
+    protected virtual void Awake() {
 
-        InitAgedMeshes();
+        //init aged meshes dictionary
+        var meshesByAge = GetMeshesByAge(GO_NAME_AGED_MESHES);
+
+        //shift the bounds negatively to have symetry when changing meshes between getting older and getting younger
+        //get the half step between max age and min age, cap to HALF_AGE_STEPS_IN_YEARS to avoid unwanted big steps
+        AgeBounds.ConvertAgesToAgeBounds(
+            meshesByAge,
+            meshesByAgeBounds,
+            (minAge, maxAge) => - (int)Mathf.Min(0.5f * (maxAge - minAge), HALF_AGE_STEPS_IN_YEARS)
+        );
     }
 
-    void OnEnable() {
+    protected virtual void OnEnable() {
 
         currentAge = realAge;
         PreviousAge = currentAge;
         UpdateMeshesWithCurrentAge();
     }
 
-    void Update() {
+    protected virtual void Update() {
         //reset previous age to reset DidAgeChange (used for updating other classes depending on AgeBehavior)
         PreviousAge = currentAge;
     }
 
-    void InitAgedMeshes() {
+    protected Dictionary<int, GameObject> GetMeshesByAge(string meshesParentName) {
 
-        var trMeshes = transform.Find(GO_NAME_MESHES);
+        var trMeshes = transform.Find(meshesParentName);
         if (trMeshes == null) {
-            throw new NotSupportedException("An aged object must have an child object named " + GO_NAME_MESHES);
+            throw new NotSupportedException("An aged object must have an child object named " + GO_NAME_AGED_MESHES);
         }
 
-        var meshesByAge = new Dictionary<int, GameObject>();
+        var res = new Dictionary<int, GameObject>();
 
         //find all behaviors with this pattern : "name#XX" where XX is the age of the element
         foreach (Transform t in trMeshes) {
@@ -68,14 +83,14 @@ public class AgeBehavior : MonoBehaviour {
             var age = 0;
             int.TryParse(name.Substring(anchorIndex + 1), out age);
 
-            if (meshesByAge.ContainsKey(age)) {
+            if (res.ContainsKey(age)) {
                 throw new InvalidOperationException("Mesh with the same age detected : " + age);
             }
 
-            meshesByAge.Add(age, go);
+            res.Add(age, go);
         }
 
-        AgeBounds.ConvertAgesToAgeBounds(meshesByAge, meshesByAgeBounds);
+        return res;
     }
 
     public void InitAges(int initialAge, int maxAge) {
@@ -88,15 +103,24 @@ public class AgeBehavior : MonoBehaviour {
         UpdateMeshesWithCurrentAge();
     }
 
+    protected bool AreAgesInSameAgeBounds(int age1, int age2) {
+
+        foreach (var e in meshesByAgeBounds) {
+
+            if (e.Key.IsInBounds(age1) && e.Key.IsInBounds(age2)) {
+                //same age bounds
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public GameObject FindMeshForAge(int age) {
         return AgeBounds.FindDataForAge(meshesByAgeBounds, age);
     }
 
-    public bool SetAgeShift(int ageShift, bool animated = false, float durationSec = 0) {
-        return SetCurrentAge(realAge + ageShift, animated, durationSec);
-    }
-
-    public bool SetCurrentAge(int age, bool animated = false, float durationSec = 0) {
+    public virtual bool SetCurrentAge(int age, bool animated = false, float durationSec = 0) {
 
         if (currentAge == age) {
             //already the same age
@@ -106,19 +130,27 @@ public class AgeBehavior : MonoBehaviour {
         PreviousAge = currentAge;
         currentAge = age;
 
+        //stop previous animation even if it's not animated now
+        if (coroutineAnimateAgeChanges != null) {
+            StopCoroutine(coroutineAnimateAgeChanges);
+        }
+
         if (!animated || durationSec <= ANIM_PERIOD_SEC) {
             UpdateMeshesWithCurrentAge();
             return true;
         }
 
         //animate changes
-        if (coroutineAnimateAgeChanges != null) {
-            StopCoroutine(coroutineAnimateAgeChanges);
-        }
-
         coroutineAnimateAgeChanges = StartCoroutine(AnimateMeshesVisibility(PreviousAge, currentAge, durationSec));
 
         return true;
+    }
+
+    /// <summary>
+    /// Change the previous age for algorithms purpose during the current frame if necessary
+    /// </summary>
+    public void OverridePreviousAge(int age) {
+        PreviousAge = age;
     }
 
     IEnumerator AnimateMeshesVisibility(int previousAge, int currentAge, float durationSec) {
@@ -192,11 +224,13 @@ public struct AgeBounds {
     }
 
 
-    //steps between ages must be 20 years, for example : [10, 30, 50] or [0, 20, 40]
-    public const float AGE_STEPS_IN_YEARS = 20;
-    public const float HALF_AGE_STEPS_IN_YEARS = AGE_STEPS_IN_YEARS / 2f;
-
-    public static void ConvertAgesToAgeBounds<T>(Dictionary<int, T> dataByAge, Dictionary<AgeBounds, T> dataByAgeBoundsToFill) {
+    /// <summary>
+    /// Take a dictionary of data by age, sort it by age and fill a dictionary of data by age bounds (2 values: min an max ages).
+    /// The Func functionShiftMaxBound allow the caller to shift all bounds in positive or negative if needed:
+    ///     - Func< int, int, int >
+    ///     - Func< returned shift, min age of the current bound, max age of the current bound>
+    /// </summary>
+    public static void ConvertAgesToAgeBounds<T>(Dictionary<int, T> dataByAge, Dictionary<AgeBounds, T> dataByAgeBoundsToFill, Func<int, int, int> functionShiftMaxBound = null) {
 
         dataByAgeBoundsToFill.Clear();
 
@@ -216,17 +250,19 @@ public struct AgeBounds {
 
             var minAge = ages[i];
             var maxAge = ages[i + 1];
-            var mesh = dataByAge[minAge];
+            var data = dataByAge[minAge];
 
             //min bound is previous max bound
             if (i > 0) {
                 minBound = maxBound;
             }
 
-            //get the half step between max age and min age, cap to HALF_AGE_STEPS_IN_YEARS to avoid unwanted big steps
-            maxBound = maxAge - (int)Mathf.Min(0.5f * (maxAge - minAge), HALF_AGE_STEPS_IN_YEARS);
+            maxBound = maxAge;
+            if (functionShiftMaxBound != null) {
+                maxBound += functionShiftMaxBound(minAge, maxAge);
+            }
 
-            dataByAgeBoundsToFill.Add(new AgeBounds(minBound, maxBound), mesh);
+            dataByAgeBoundsToFill.Add(new AgeBounds(minBound, maxBound), data);
         }
 
         dataByAgeBoundsToFill.Add(new AgeBounds(maxBound, int.MaxValue), dataByAge.Last().Value);

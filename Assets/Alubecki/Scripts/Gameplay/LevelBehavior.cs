@@ -11,7 +11,7 @@ public class LevelBehavior : MonoBehaviour {
 
     public bool IsFirstLevelOfChapter { get; private set; }
     public int LevelNumber { get; private set; }
-    public string TextStory { get; protected set; }
+    public string TextStory => dataChapter.GetTextStory(LevelNumber);
 
 
     public void InitLevel(DataChapter dataChapter, int levelNumber) {
@@ -20,7 +20,20 @@ public class LevelBehavior : MonoBehaviour {
 
         IsFirstLevelOfChapter = levelNumber == 1;
         LevelNumber = levelNumber;
-        TextStory = dataChapter.GetTextStory(levelNumber);
+
+        PlayMusic();
+    }
+
+    public void PlayMusic() {
+
+        Game.Instance.audioManager.PlayMusic(dataChapter.GetMusic(LevelNumber));
+        Game.Instance.audioManager.PlayAmbience(dataChapter.GetAmbience(LevelNumber));
+    }
+
+    public void StopMusic() {
+
+        Game.Instance.audioManager.PlayMusic(null);
+        Game.Instance.audioManager.PlayAmbience(null);
     }
 
 }

@@ -5,10 +5,13 @@ using UnityEngine;
 public abstract class BaseElementBehavior : GridPosBehavior {
 
 
+    [SerializeField] bool preventFromWalkingOn;
+
     public virtual bool IsCursorAboveElement => true;
     public virtual bool CanBeSelected => false;
     public int ColliderHeight => GetComponentInChildren<OverridenHeightBehavior>()?.ColliderHeight ?? 1;
-    public virtual bool IsWalkableOn => true;
+    public virtual bool IsPhysicallyWalkableInBlock => !preventFromWalkingOn && ColliderHeight <= 0;
+    public virtual bool IsPhysicallyWalkableOverBlock => !preventFromWalkingOn && ColliderHeight > 0;
     public virtual bool CanMove => false;
     public virtual bool CanFall => false;
     protected virtual BaseMovement.Factory[] PossibleMovements => null;

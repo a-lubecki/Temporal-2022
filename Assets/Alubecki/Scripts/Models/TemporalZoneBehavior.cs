@@ -9,7 +9,7 @@ public class TemporalZoneBehavior : MonoBehaviour {
 
 
     GameObject goMesh;
-    MeshRenderer[] meshRenderersZone;
+    Outline2 outline;
     [SerializeField] TemporalAbilityBehavior ownerElem;
 
     [SerializeField] int ageShiftYears = 0;
@@ -20,10 +20,29 @@ public class TemporalZoneBehavior : MonoBehaviour {
 
     void Awake() {
         goMesh = transform.GetChild(0).gameObject;
-        meshRenderersZone = GetComponentsInChildren<MeshRenderer>();
+        outline = goMesh.GetComponent<Outline2>();
     }
 
     void Update() {
+        UpdateZone();
+    }
+
+    public void SetOwner(TemporalAbilityBehavior ownerElem) {
+
+        this.ownerElem = ownerElem;
+
+        if (ownerElem != null) {
+            ageShiftYears = ownerElem.TemporalAbility.AgeShiftYears;
+            outline.OutlineColor = ownerElem.TemporalAbility.ZoneColor;
+        } else {
+            ageShiftYears = 0;
+            outline.OutlineColor = Color.white;
+        }
+
+        UpdateZone();
+    }
+
+    void UpdateZone() {
 
         if (IsTemporalityActive) {
 
@@ -36,24 +55,6 @@ public class TemporalZoneBehavior : MonoBehaviour {
         } else {
 
             goMesh.SetActive(false);
-        }
-    }
-
-    public void SetOwner(TemporalAbilityBehavior ownerElem) {
-
-        this.ownerElem = ownerElem;
-
-        if (ownerElem != null) {
-            UpdateZone(ownerElem.TemporalAbility);
-        }
-    }
-
-    void UpdateZone(DataTemporalAbility data) {
-
-        ageShiftYears = data.AgeShiftYears;
-
-        foreach (var r in meshRenderersZone) {
-            r.material = data.ZoneMaterial;
         }
     }
 
