@@ -969,5 +969,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb4475b6b792e45df81a16cea138468d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  preventFromWalkingOn: 0
   objectName: Bush
   objectDescription: It grows then sags when it becomes older.

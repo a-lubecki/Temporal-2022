@@ -39,7 +39,6 @@ public class InGameControlsBehavior : BaseControlsBehavior {
         MustRotateCameraRight = false;
         MustDezoom = false;
         MustZoom = false;
-        PointerPosition = Vector3.zero;
         MustNavigatePointer = false;
         MustValidateSelection = false;
         MustCancelSelection = false;
@@ -79,9 +78,7 @@ public class InGameControlsBehavior : BaseControlsBehavior {
     }
 
     //callback from PlayerInput
-    void OnSelect(InputValue v) {
-
-        PointerPosition = v.Get<Vector2>();
+    void OnSelect() {
 
         if (!isPointerOverUI) {
             MustValidateSelection = true;

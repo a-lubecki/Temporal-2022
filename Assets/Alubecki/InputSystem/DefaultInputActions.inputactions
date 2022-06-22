@@ -62,12 +62,12 @@
                 },
                 {
                     "name": "Select",
-                    "type": "Value",
+                    "type": "Button",
                     "id": "5f920591-25d9-4a44-a3b0-21bd9bfbbc07",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
+                    "interactions": "Press",
+                    "initialStateCheck": false
                 },
                 {
                     "name": "Deselect",
@@ -75,7 +75,7 @@
                     "id": "1ad257d5-1c11-4df0-bc6c-beca3c18b84c",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "",
+                    "interactions": "Press",
                     "initialStateCheck": false
                 },
                 {
@@ -242,37 +242,15 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "One Modifier",
-                    "id": "e0f6611b-535c-4d49-9888-9258a8fabd42",
-                    "path": "OneModifier",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Select",
-                    "isComposite": true,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "modifier",
-                    "id": "69b6ac12-6503-4519-b90e-610af8e6ce4d",
+                    "name": "",
+                    "id": "5e7f390c-fdf5-4dbe-8e74-e80505ee8eb5",
                     "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "Select",
                     "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "binding",
-                    "id": "1c08c0f6-410d-448b-8545-021eec0e2fe2",
-                    "path": "<Mouse>/position",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Select",
-                    "isComposite": false,
-                    "isPartOfComposite": true
+                    "isPartOfComposite": false
                 },
                 {
                     "name": "1D Axis",

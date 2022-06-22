@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -8,9 +7,6 @@ public class TemporalityManager : MonoBehaviour {
 
 
     public const float DURATION_ANIM_FROM_AGE_TO_AGE_SEC = 0.2f;
-
-
-    Dictionary<BaseElementBehavior, int> agesBeforeResolve = new Dictionary<BaseElementBehavior, int>();
 
 
     public void InitZones() {
@@ -36,33 +32,114 @@ public class TemporalityManager : MonoBehaviour {
         return GetComponentsInChildren<TemporalZoneBehavior>().Where(z => z.IsTemporalityActive);
     }
 
-    public IEnumerator ResolveTemporality() {
 
-        var isAnimatingZones = false;
-        var zones = GetZones();
-        var agedElements = Game.Instance.boardBehavior.GetElements().Where(e => e.TryGetComponent<AgeBehavior>(out _));
+    public void ComputeTemporalityAndGravity() {
 
-        agesBeforeResolve.Clear();
+        ClearParadoxes();
+
+        var aboutToFallElements = Game.Instance.boardBehavior.GetAboutToFallElements();
+
+        var nbLoops = 0;
+
+        var agesBeforeResolve = new Dictionary<BaseElementBehavior, int>();
+        var positionsBeforeResolve = new Dictionary<BaseElementBehavior, Vector3>();
+        var paradoxPositionElements = new Dictionary<BaseElementBehavior, Vector3>();
+
+        do {
+            ResolveGravity(aboutToFallElements, positionsBeforeResolve, paradoxPositionElements);
+
+            agesBeforeResolve.Clear();
+            ResolveTemporality(agesBeforeResolve, positionsBeforeResolve, paradoxPositionElements);
+
+            ResolveParadoxes(agesBeforeResolve, positionsBeforeResolve, paradoxPositionElements);
+
+            nbLoops++;
+
+            if (nbLoops >= 3) {
+                break;
+            }
+
+            aboutToFallElements = Game.Instance.boardBehavior.GetAboutToFallElements();
+
+        } while (aboutToFallElements.Count() > 0);
+    }
+
+    void ClearParadoxes() {
+
+        //clear paradox states
+        var agedElements = Game.Instance.boardBehavior.GetElements().Where(e => e.TryGetComponent<AgeParadoxBehavior>(out _));
 
         foreach (var elem in agedElements) {
-
-            var previousAge = elem.GetComponent<AgeBehavior>().PreviousAge;
-
-            if (ResolveTemporalityForElement(elem, zones, true)) {
-
-                isAnimatingZones = true;
-
-                //only retain age if temporality was resolved (this dictionary is used t resolve paradoxes in case age changed)
-                agesBeforeResolve.Add(elem, previousAge);
-            }
-        }
-
-        if (isAnimatingZones) {
-            yield return new WaitForSeconds(DURATION_ANIM_FROM_AGE_TO_AGE_SEC + 0.1f);
+            elem.GetComponent<AgeParadoxBehavior>().ClearParadoxState();
         }
     }
 
-    public void ResolveParadoxes() {
+    void ResolveGravity(IEnumerable<BaseElementBehavior> aboutToFallElements, Dictionary<BaseElementBehavior, Vector3> positionsBeforeResolve, Dictionary<BaseElementBehavior, Vector3> paradoxPositionElements) {
+
+        foreach (var elem in aboutToFallElements) {
+            ResolveGravityForElement(elem, positionsBeforeResolve, paradoxPositionElements);
+        }
+    }
+
+    void ResolveGravityForElement(BaseElementBehavior elem, Dictionary<BaseElementBehavior, Vector3> positionsBeforeResolve, Dictionary<BaseElementBehavior, Vector3> paradoxPositionElements) {
+
+        var fallHeight = Game.Instance.boardBehavior.GetFallHeight(elem);
+        if (fallHeight <= 0) {
+            //no changes
+            return;
+        }
+
+        var elemsToFall = Game.Instance.boardBehavior.GetSortedElementsAbove(elem)
+            .Prepend(elem);
+
+        foreach (var e in elemsToFall) {
+
+            if (paradoxPositionElements != null && paradoxPositionElements.ContainsKey(e)) {
+                //in paradox state, avoid an infinite loop
+                continue;
+            }
+
+            if (!positionsBeforeResolve.ContainsKey(e)) {
+                positionsBeforeResolve.Add(e, e.GridPos);
+            }
+
+            //fall
+            e.SetGridPos(e.GridPos + Vector3.down * fallHeight);
+        }
+    }
+
+    public void ResolveTemporality(Dictionary<BaseElementBehavior, int> agesBeforeResolve, Dictionary<BaseElementBehavior, Vector3> positionsBeforeResolve, Dictionary<BaseElementBehavior, Vector3> paradoxPositionElements) {
+
+        var zones = GetZones();
+        var agedElements = Game.Instance.boardBehavior.GetElements().Where(e => e.TryGetComponent<AgeBehavior>(out _));
+        /*
+                var agedElemsByAges = agedElements.Select(e => new KeyValuePair<BaseElementBehavior, int>(e, e.GetComponent<AgeBehavior>().CurrentAge));
+                ResolveParadoxesInternal(agedElemsByAges.ToDictionary(e => e.Key, e => e.Value));
+        */
+        foreach (var elem in agedElements) {
+
+            if (IsInParadoxState(elem)) {
+                //avoid changing age if already in paradox
+                continue;
+            }
+
+            var previousAge = elem.GetComponent<AgeBehavior>().CurrentAge;
+
+            if (ResolveTemporalityForElement(elem, zones, positionsBeforeResolve, paradoxPositionElements)) {
+
+                //only retain age if temporality was resolved (this dictionary is used to resolve paradoxes in case age changed)
+                if (!agesBeforeResolve.ContainsKey(elem)) {
+                    agesBeforeResolve.Add(elem, previousAge);
+                }
+            }
+        }
+    }
+
+    bool IsInParadoxState(BaseElementBehavior elem) {
+        return elem.GetComponent<AgeParadoxBehavior>()?.IsInParadoxState ?? false;
+    }
+
+    public void ResolveParadoxes(Dictionary<BaseElementBehavior, int> agesBeforeResolve, Dictionary<BaseElementBehavior, Vector3> positionsBeforeResolve, Dictionary<BaseElementBehavior, Vector3> paradoxPositionElements) {
 
         var zones = GetZones();
 
@@ -72,21 +149,33 @@ public class TemporalityManager : MonoBehaviour {
             var elem = e.Key;
             var previousAge = e.Value;
 
-            var ageBehavior = elem.GetComponent<AgeBehavior>();
+            elem.TryGetComponent<AgeParadoxBehavior>(out var ageParadoxBehavior);
 
-            if (previousAge != ageBehavior.CurrentAge) {
+            if (ageParadoxBehavior != null && previousAge != ageParadoxBehavior.CurrentAge) {
 
                 //reset the previous age because it has been replaced by the current age after the animation
                 //previous age is needed by the algorithm in AgeParadoxBehavior
-                ageBehavior.OverridePreviousAge(previousAge);
+                ageParadoxBehavior.OverridePreviousAge(previousAge);
 
                 //if nothing changed after the next resolve, the elem is in paradox state, it won't be animated as it's in the previous age
-                ResolveTemporalityForElement(elem, zones, false);
+                if (!ResolveTemporalityForElement(elem, zones, positionsBeforeResolve, paradoxPositionElements)) {
+
+                    //resolve gravity for the pile and mark the objects as paradox
+                    var elementsAbove = Game.Instance.boardBehavior.GetSortedElementsAbove(elem);
+                    ResolveGravity(elementsAbove, positionsBeforeResolve, paradoxPositionElements);
+
+                    foreach (var eAbove in elementsAbove) {
+
+                        if (paradoxPositionElements != null && !paradoxPositionElements.ContainsKey(eAbove)) {
+                            paradoxPositionElements[eAbove] = eAbove.GridPos;
+                        }
+                    }
+                }
             }
         }
     }
 
-    bool ResolveTemporalityForElement(BaseElementBehavior elem, IEnumerable<TemporalZoneBehavior> zones, bool animated) {
+    bool ResolveTemporalityForElement(BaseElementBehavior elem, IEnumerable<TemporalZoneBehavior> zones, Dictionary<BaseElementBehavior, Vector3> positionsBeforeResolve, Dictionary<BaseElementBehavior, Vector3> paradoxPositionElements) {
 
         var totalAgeShift = 0;
 
@@ -106,16 +195,16 @@ public class TemporalityManager : MonoBehaviour {
         var ageBehavior = elem.GetComponent<AgeBehavior>();
 
         //change age
-        var changed = ageBehavior.SetCurrentAge(ageBehavior.RealAge + totalAgeShift, animated, DURATION_ANIM_FROM_AGE_TO_AGE_SEC);
+        var changed = ageBehavior.SetCurrentAge(ageBehavior.RealAge + totalAgeShift, false);
         if (changed) {
-            PushElementsAboveIfNecessary(elem, ageBehavior);
+            PushElementsAboveIfNecessary(elem, ageBehavior, positionsBeforeResolve, paradoxPositionElements);
             return true;
         }
 
         return false;
     }
 
-    void PushElementsAboveIfNecessary(BaseElementBehavior elem, AgeBehavior ageBehavior) {
+    void PushElementsAboveIfNecessary(BaseElementBehavior elem, AgeBehavior ageBehavior, Dictionary<BaseElementBehavior, Vector3> positionsBeforeResolve, Dictionary<BaseElementBehavior, Vector3> paradoxPositionElements) {
 
         var previousColliderHeight = elem.GetColliderHeightForAge(ageBehavior.PreviousAge);
         var nextColliderHeight = elem.GetColliderHeightForAge(ageBehavior.CurrentAge);
@@ -143,7 +232,18 @@ public class TemporalityManager : MonoBehaviour {
 
         //push all elements up at the same time with the same diff height
         foreach (var e in elementsToPush) {
-            e.TryMoveUp(diff, DURATION_ANIM_FROM_AGE_TO_AGE_SEC);
+
+            if (paradoxPositionElements != null && paradoxPositionElements.ContainsKey(e)) {
+                //avoid an infinite loop
+                continue;
+            }
+
+            if (positionsBeforeResolve!= null && !positionsBeforeResolve.ContainsKey(e)) {
+                positionsBeforeResolve.Add(e, e.GridPos);
+            }
+
+            //move up
+            e.SetGridPos(e.GridPos + Vector3.up * diff);
         }
     }
 

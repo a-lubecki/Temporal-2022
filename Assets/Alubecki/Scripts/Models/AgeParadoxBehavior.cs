@@ -13,6 +13,9 @@ public class AgeParadoxBehavior : AgeBehavior {
     BaseElementBehavior elem;
     Dictionary<int, GameObject> meshesByParadoxAge;
 
+    public bool IsInParadoxState { get; private set; }
+    public int ParadoxAge { get; private set; }
+
 
     protected override void Awake() {
         base.Awake();
@@ -26,20 +29,26 @@ public class AgeParadoxBehavior : AgeBehavior {
         HideParadoxMeshes();
     }
 
-    public override bool SetCurrentAge(int age, bool animated = false, float durationSec = 0) {
+    public void ClearParadoxState() {
 
         HideParadoxMeshes();
 
-        if (CurrentAge == age) {
-            //already the same age
+        IsInParadoxState = false;
+        ParadoxAge = 0;
+    }
+
+    public override bool SetCurrentAge(int age, bool animated = false, float durationSec = 0) {
+
+        if (IsInParadoxState && (age == ParadoxAge || age == CurrentAge)) {
             return false;
         }
 
-        var previousAge = PreviousAge;
+        HideParadoxMeshes();
 
+        var previousAge = PreviousAge;
         var hasChanged = base.SetCurrentAge(age, animated, durationSec);
 
-        if (previousAge == CurrentAge) {
+        if (previousAge == CurrentAge && PreviousAge != CurrentAge) {// || (!hasChanged && PreviousAge == CurrentAge)) {
 
             //the object stay with the same age but displays the paradox of the previous age
             if (!ShowParadoxMesh(PreviousAge)) {
@@ -60,6 +69,8 @@ public class AgeParadoxBehavior : AgeBehavior {
             if (AreAgesInSameAgeBounds(e.Key, age)) {
                 //found mesh
                 e.Value.SetActive(true);
+                IsInParadoxState = true;
+                ParadoxAge = age;
                 return true;
             }
         }
@@ -72,6 +83,8 @@ public class AgeParadoxBehavior : AgeBehavior {
         foreach (var e in meshesByParadoxAge) {
             e.Value.SetActive(false);
         }
+
+        IsInParadoxState = false;
     }
 
 }

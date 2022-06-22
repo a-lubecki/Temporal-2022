@@ -17,6 +17,10 @@ MonoBehaviour:
     years ago. He entered the forest near his old house, the final place to find
     answers.
   dataLevel:
+  - prefab: {fileID: 8793353213195119226, guid: 03b07038979ad47a6a8648f8a63326a8, type: 3}
+    audioClipMusic: {fileID: 0}
+    audioClipAmbience: {fileID: 0}
+    textStory: Test
   - prefab: {fileID: 8793353213195119226, guid: 47c9a9f0a92f04e76ae7b7c7c45528ef, type: 3}
     audioClipMusic: {fileID: 0}
     audioClipAmbience: {fileID: 0}

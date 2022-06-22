@@ -77,59 +77,34 @@ public class MovementResolver : MonoBehaviour {
 
         onComplete?.Invoke();
     }
-/*
+
     IEnumerator ResolveTemporalityAndGravity() {
 
-        var aboutToFallElements = Game.Instance.boardBehavior.GetAboutToFallElements();
-
-        do {
-
-            yield return ResolveGravity(aboutToFallElements);
-
-            yield return Game.Instance.temporalityManager.ResolveTemporality();
-
-            aboutToFallElements = Game.Instance.boardBehavior.GetAboutToFallElements();
-
-        } while (aboutToFallElements.Count() > 0);
-
-        Game.Instance.temporalityManager.ResolveParadoxes();
+        //TEST METHOD WITHOUT ANIMS
+        Game.Instance.temporalityManager.ComputeTemporalityAndGravity();
+        yield return new WaitForSeconds(0.1f);
     }
-*/
-    IEnumerator ResolveTemporalityAndGravity() {
+    /*
+        IEnumerator ResolveTemporalityAndGravity() {
 
-        yield return ResolveGravity(Game.Instance.boardBehavior.GetAboutToFallElements());
+            var currentSnapshot = Game.Instance.memento.GetCurrentSnapshot();
 
-        yield return Game.Instance.temporalityManager.ResolveTemporality();
+            Game.Instance.temporalityManager.ComputeTemporalityAndGravity();
 
-        yield return ResolveGravity(Game.Instance.boardBehavior.GetAboutToFallElements());
+            var newSnapshot = Game.Instance.boardBehavior.CreateSnapshot();
+            Game.Instance.memento.Restore(currentSnapshot);
 
-        Game.Instance.temporalityManager.ResolveParadoxes();
-    }
+            yield return AnimateChangesBetweenSnapshots(currentSnapshot, newSnapshot);
+        }*/
 
-    IEnumerator ResolveGravity(IEnumerable<BaseElementBehavior> aboutToFallElements) {
+    /*
+        IEnumerator AnimateChangesBetweenSnapshots(Snapshot previous, Snapshot next) {
 
-        var board = Game.Instance.boardBehavior;
+            //TODO
 
-        var fallingElemsCount = 0;
-
-        foreach (var elem in aboutToFallElements) {
-
-            var fallHeight = board.GetFallHeight(elem);
-            var durationSec = 0.4f * fallHeight;
-
-            fallingElemsCount++;
-            elem.TryFall(fallHeight, durationSec, () => fallingElemsCount--);
-
-            foreach (var supElem in board.GetSortedElementsAbove(elem)) {
-
-                fallingElemsCount++;
-                supElem.TryFall(fallHeight, durationSec, () => fallingElemsCount--);
-            }
-        }
-
-        yield return new WaitWhile(() => fallingElemsCount > 0);
-        yield return new WaitForSeconds(0.01f);
-    }
+            yield return new WaitWhile(() => nbAnims > 0);
+            yield return new WaitForSeconds(0.01f);
+        }*/
 
     IEnumerator ResolveNPCMovements() {
 
