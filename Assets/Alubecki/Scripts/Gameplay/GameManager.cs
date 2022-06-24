@@ -17,6 +17,8 @@ public class GameManager : MonoBehaviour {
     public LevelBehavior CurrentLevel => Game.Instance.boardBehavior.CurrentLevel;
     public int CurrentLevelNumber => CurrentLevel.LevelNumber;
     public bool IsFirstLevelOfChapter => CurrentLevel?.IsFirstLevelOfChapter ?? false;
+    public bool MustShowChapter { get; private set; }
+    public bool MustStartAfterShowingChapter => !Game.Instance.viewChapterBehavior.IsVisible;
     public bool IsLevelAnimating { get; private set; }
     public bool IsLevelShown { get; private set; }
     public bool IsLevelReadyToPlay => IsLevelShown && !IsLevelAnimating;
@@ -47,6 +49,7 @@ public class GameManager : MonoBehaviour {
         Game.Instance.panelLevelInfo.Hide();
         Game.Instance.panelWin.Hide();
         Game.Instance.viewGameOverBehavior.Hide();
+        Game.Instance.viewChapterBehavior.Hide();
     }
 
     void OnApplicationQuit() {
@@ -88,6 +91,8 @@ public class GameManager : MonoBehaviour {
         Game.Instance.inGameControlsBehavior.SelectCurrentActionMap();
         Game.Instance.inGameControlsBehavior.DisableControls();
 
+        MustShowChapter = (nextLevelNumberToLoad <= 1);
+
         IsLevelAnimating = false;
         IsLevelShown = false;
 
@@ -108,6 +113,11 @@ public class GameManager : MonoBehaviour {
         nextLevelNumberToLoad++;
 
         Game.Instance.panelLevelInfo.Show(dataChapter.ChapterName, CurrentLevelNumber);
+    }
+
+    public void OnShowChapter() {
+
+        Game.Instance.viewChapterBehavior.Show(dataChapter);
     }
 
     public void OnAnimateLevelShowBegin() {
@@ -165,6 +175,7 @@ public class GameManager : MonoBehaviour {
     }
 
     public void OnSelectionStepEnd() {
+
 
         Game.Instance.selectionStepManager.enabled = false;
     }

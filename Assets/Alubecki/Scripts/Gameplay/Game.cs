@@ -39,6 +39,7 @@ public class Game : MonoBehaviourSingleton<Game> {
     public PanelPileBehavior panelPileBehavior;
     public PanelWin panelWin;
     public ViewGameOverBehavior viewGameOverBehavior;
+    public ViewChapterBehavior viewChapterBehavior;
 
     public AudioManager audioManager;
 

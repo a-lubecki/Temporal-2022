@@ -36,6 +36,9 @@ public abstract class BaseElementBehavior : GridPosBehavior, IMementoOriginator 
         return new List<BaseMovement.Factory>(PossibleMovements);
     }
 
+    public virtual void OnDeselect() {
+        //override if necessary
+    }
 
     public IMementoSnapshot NewSnapshot() {
 
@@ -112,9 +115,13 @@ public abstract class BaseElementBehavior : GridPosBehavior, IMementoOriginator 
             }
 
             //set paradox manually
-            if (ageParadoxBehavior != null && snapshot.isInParadoxState) {
+            if (ageParadoxBehavior != null) {
+
                 ageParadoxBehavior.ClearParadoxState();
-                ageParadoxBehavior.ShowParadoxMesh(snapshot.ageInParadox);
+
+                if (snapshot.isInParadoxState) {
+                    ageParadoxBehavior.ShowParadoxMesh(snapshot.ageInParadox);
+                }
             }
         }
 

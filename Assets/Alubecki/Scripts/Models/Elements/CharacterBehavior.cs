@@ -73,9 +73,9 @@ public class CharacterBehavior : BaseElementBehavior {
     );
 
     Color GetDisplayableColor() => Team switch {
-        Team.ALLY => Color.green,
-        Team.ENEMY => Color.red,
-        Team.NEUTRAL => new Color(1, 0.5f, 0),
+        Team.ALLY => new Color(0.3f, 0.8f, 0.3f),
+        Team.ENEMY => new Color(0.8f, 0.3f, 0.3f),
+        Team.NEUTRAL => new Color(0.8f, 0.6f, 0.3f),
         _ => throw new NotImplementedException()
     };
 
@@ -151,6 +151,11 @@ public class CharacterBehavior : BaseElementBehavior {
         if (ageBehavior.DidAgeChange) {
             UpdateCharacteristicsWithCurrentAge();
         }
+    }
+
+    public override void OnDeselect() {
+
+        ReleaseMovableObject(true);
     }
 
     public void InitWithCharacterData(DataCharacterInChapter dataCharacterInChapter) {
@@ -352,7 +357,7 @@ public class CharacterBehavior : BaseElementBehavior {
         //callback if necessary
         if (onComplete != null) {
             s.AppendInterval(0.01f)
-                .OnComplete(() => onComplete.Invoke());
+                .OnComplete(() => onComplete());
         }
 
         Game.Instance.audioManager.PlaySimpleSound(AudioClipMove);

@@ -99,7 +99,13 @@ public class ElementsSelectionBehavior : MonoBehaviour {
     }
 
     public void CancelSelection(bool canPlaySound = true) {
+
+        var previousSelectedElem = SelectedElement;
+
         ValidateSelection(null, canPlaySound);
+
+        //callback after deselect to void bug with call order
+        previousSelectedElem?.OnDeselect();
     }
 
     public void ClearLastSelected() {

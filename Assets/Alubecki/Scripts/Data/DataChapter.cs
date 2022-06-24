@@ -7,7 +7,7 @@ public class DataChapter : ScriptableObject {
 
 
     [field: SerializeField] public string ChapterName { get; protected set; }
-    [field: SerializeField] public string TextChapterStory { get; protected set; }
+    [field: SerializeField, TextArea] public string TextChapterStory { get; protected set; }
     [SerializeField] DataLevel[] dataLevel;
 
 

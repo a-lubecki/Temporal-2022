@@ -12,6 +12,8 @@ public class CameraController : MonoBehaviour {
 
 
     [SerializeField] CinemachineVirtualCamera vcamDolly;
+    CinemachineTrackedDolly vcamTrackedDolly;
+    CinemachineComposer vcamComposer;
     [SerializeField] Transform trDollyTrack;
     [SerializeField] Transform trCamLookAt;
     AudioSource audioSource;
@@ -21,10 +23,20 @@ public class CameraController : MonoBehaviour {
 
     HorizontalPosition lastHorizontalPosition = (HorizontalPosition)(-1);//optim for LateUpdate
     ZoomLevel lastZoomLevel = (ZoomLevel)(-1);//optim for LateUpdate
-
+    float initialHorizontalDamping;
+    float initialVerticalDamping;
 
     void Awake() {
+
         audioSource = GetComponent<AudioSource>();
+        vcamTrackedDolly = vcamDolly.GetCinemachineComponent<CinemachineTrackedDolly>();
+        vcamComposer = vcamDolly.GetCinemachineComponent<CinemachineComposer>();
+    }
+
+    void Start() {
+
+        initialHorizontalDamping = vcamComposer.m_HorizontalDamping;
+        initialVerticalDamping = vcamComposer.m_VerticalDamping;
     }
 
     void Update() {
@@ -47,7 +59,7 @@ public class CameraController : MonoBehaviour {
         //change pivot rotation to rotate cam
         if (horizontalPosition != lastHorizontalPosition) {
 
-            vcamDolly.GetCinemachineComponent<CinemachineTrackedDolly>().m_PathPosition = GetDollyTrackPathPosition();
+            vcamTrackedDolly.m_PathPosition = GetDollyTrackPathPosition();
             lastHorizontalPosition = horizontalPosition;
 
             audioSource.Play();
@@ -65,7 +77,15 @@ public class CameraController : MonoBehaviour {
 
         //change "look at" position to change orientation to selected object
         var selectedElem = Game.Instance.elementsSelectionBehavior.SelectedElement;
-        trCamLookAt.transform.position = selectedElem?.transform.position ?? Vector3.zero;
+        var newPosition = selectedElem?.transform.position ?? Vector3.zero;
+
+        if (newPosition != trCamLookAt.transform.position) {
+
+            vcamComposer.m_HorizontalDamping = initialHorizontalDamping;
+            vcamComposer.m_VerticalDamping = initialVerticalDamping;
+
+            trCamLookAt.transform.position = newPosition;
+        }
     }
 
     public void ResetRotationAndZoom() {
@@ -74,9 +94,18 @@ public class CameraController : MonoBehaviour {
         zoomLevel = ZoomLevel.DEFAULT;
     }
 
-    void RotateLeft() {
+    void PrepareCamToMove() {
 
         Game.Instance.inGameControlsBehavior.DisableControlsForSeconds(DELAY_BETWEEN_MOVES_SEC);
+
+        //avoid a camera bug when damping is not zero
+        vcamComposer.m_HorizontalDamping = 0;
+        vcamComposer.m_VerticalDamping = 0;
+    }
+
+    void RotateLeft() {
+
+        PrepareCamToMove();
 
         horizontalPosition = horizontalPosition switch {
             HorizontalPosition.SW => HorizontalPosition.NW,
@@ -89,7 +118,7 @@ public class CameraController : MonoBehaviour {
 
     void RotateRight() {
 
-        Game.Instance.inGameControlsBehavior.DisableControlsForSeconds(DELAY_BETWEEN_MOVES_SEC);
+        PrepareCamToMove();
 
         horizontalPosition = horizontalPosition switch {
             HorizontalPosition.SW => HorizontalPosition.SE,
@@ -102,7 +131,7 @@ public class CameraController : MonoBehaviour {
 
     void Dezoom() {
 
-        Game.Instance.inGameControlsBehavior.DisableControlsForSeconds(DELAY_BETWEEN_MOVES_SEC);
+        PrepareCamToMove();
 
         zoomLevel = zoomLevel switch {
             ZoomLevel.CLOSE => ZoomLevel.DEFAULT,
@@ -113,7 +142,7 @@ public class CameraController : MonoBehaviour {
 
     void Zoom() {
 
-        Game.Instance.inGameControlsBehavior.DisableControlsForSeconds(DELAY_BETWEEN_MOVES_SEC);
+        PrepareCamToMove();
 
         zoomLevel = zoomLevel switch {
             ZoomLevel.CLOSE or ZoomLevel.DEFAULT => ZoomLevel.CLOSE,

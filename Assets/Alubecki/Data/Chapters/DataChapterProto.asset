@@ -12,19 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b71571a4ec4e14698bd03a7099cf8251, type: 3}
   m_Name: DataChapterProto
   m_EditorClassIdentifier: 
-  <ChapterName>k__BackingField: Prototype
-  <TextChapterStory>k__BackingField: "C1 cherchait des r\xE9ponses \xE0 ce qu\u2019il
+  <ChapterName>k__BackingField: 'Chapter 0: Demo'
+  <TextChapterStory>k__BackingField: "Ethan cherchait des r\xE9ponses \xE0 ce qu\u2019il
     s\u2019\xE9tait pass\xE9 20 ans plus t\xF4t. C\u2019est comme si l\u2019attaque
-    extraterrestre n\u2019avait jamais eu lieu pour le reste des habitants. Depuis
-    quelques jours, il arpentait la for\xEAt pr\xE8s de sa ville natale, le dernier
+    extraterrestre n\u2019avait jamais eu lieu pour le reste des habitants.\n\nIl
+    arpentait la for\xEAt pr\xE8s de sa ville natale depuis quelques jours, le dernier
     endroit qu\u2019il n\u2019avait pas encore explor\xE9."
   dataLevel:
   - prefab: {fileID: 8793353213195119226, guid: b4cfab4b54b714c4696b601e0d193910, type: 3}
     audioClipMusic: {fileID: 8300000, guid: 8cde2c7b380634ceb849108e4e81cbb5, type: 3}
     audioClipAmbience: {fileID: 8300000, guid: 7ea35180419ee4824af0dc1f5800a2b9, type: 3}
-    textStory: "Peu de monde allait dans cette for\xEAt car le chemin n\u2019\xE9tait
-      pas balis\xE9, le parfait endroit pour se cacher. Il restait seulement quelques
-      fournitures abandonn\xE9es d\u2019exploitations foresti\xE8res."
+    textStory: "Peu de randonneurs osaient p\xE9n\xE9trer dans cette for\xEAt car
+      le chemin n\u2019\xE9tait pas balis\xE9. Il restait seulement d\u2019anciennes
+      fournitures d\u2019exploitations foresti\xE8res abandonn\xE9es."
   - prefab: {fileID: 8793353213195119226, guid: a2c463457fa1c425fbeaea9b66843c6a, type: 3}
     audioClipMusic: {fileID: 8300000, guid: 8cde2c7b380634ceb849108e4e81cbb5, type: 3}
     audioClipAmbience: {fileID: 8300000, guid: 7ea35180419ee4824af0dc1f5800a2b9, type: 3}
@@ -33,49 +33,50 @@ MonoBehaviour:
   - prefab: {fileID: 8793353213195119226, guid: b56c26ffe815944afa822173b52f9165, type: 3}
     audioClipMusic: {fileID: 0}
     audioClipAmbience: {fileID: 0}
-    textStory: "Il avait r\xE9ussi \xE0 trouver, un extraterrestre en armure se dressait
-      devant lui. Il avait surv\xE9cu ici, cach\xE9 tout ce temps. \xC9tait-il ami
-      ou ennemi ? Un tir de blaster le tira de sa torpeur. Un autre extraterrestre
-      sortit d\u2019un buisson derri\xE8re lui. Il fallait fuir..."
+    textStory: "Un extraterrestre en armure se dressait devant lui. Il avait surv\xE9cu
+      ici tout ce temps. \xC9tait-il ami ou ennemi ? \nUn tir de blaster le tira
+      de sa torpeur. Un autre extraterrestre sortit d\u2019un buisson derri\xE8re
+      lui. Il fallait fuir !"
   - prefab: {fileID: 8793353213195119226, guid: 1986e1a58fa4a49378afe0f2f83a405e, type: 3}
     audioClipMusic: {fileID: 8300000, guid: a200154d982bd4006a0b28b5b0d03f47, type: 3}
     audioClipAmbience: {fileID: 0}
     textStory: "Aucun des deux ne l\u2019avait suivi. Il reprit ses esprits et s'\xE9loigna
-      de la zone. Soudain, il ressentit une sensation \xE9trange, comme si l'environnement
+      de la zone.\nSoudain, il ressentit une sensation \xE9trange, comme si l'environnement
       changeait autour de lui."
   - prefab: {fileID: 8793353213195119226, guid: 6935391cb6ea54b2ea9ade8d740c50eb, type: 3}
     audioClipMusic: {fileID: 8300000, guid: a200154d982bd4006a0b28b5b0d03f47, type: 3}
     audioClipAmbience: {fileID: 8300000, guid: 7ea35180419ee4824af0dc1f5800a2b9, type: 3}
     textStory: "Cet extraterrestre au campement lui avait jet\xE9 une sorte de cristal
       que son corps avait compl\xE8tement absorb\xE9. D\xE9sormais, aussi \xE9trange
-      que cela puisse para\xEEtre, l\u2019environnement vieillissait temporairement.
-      Il venait m\xEAme d\u2019assister \xE0 un paradoxe temporel avec ce dernier
-      buisson."
+      que cela puisse para\xEEtre, l\u2019environnement vieillissait autour de lui.
+      Il venait m\xEAme d\u2019assister \xE0 un \xE9trange paradoxe temporel en grimpant
+      \xE0 c\xF4t\xE9 de ce buisson."
   - prefab: {fileID: 8793353213195119226, guid: e7d11af903d8b48d49e5bfb6b0e2fc76, type: 3}
     audioClipMusic: {fileID: 8300000, guid: a200154d982bd4006a0b28b5b0d03f47, type: 3}
     audioClipAmbience: {fileID: 8300000, guid: 4ba1475fa9ae543d78789a70aac854aa, type: 3}
-    textStory: "L'extraterrestre du campement l\u2019avait sauv\xE9 en lui offrant
-      cette capacit\xE9 temporelle et il venait de le sauver en retour. Alors, qu\u2019il
-      commen\xE7ait \xE0 en comprendre les subtilit\xE9s, il eut la sensation qu\u2019il
-      devrait se creuser les m\xE9ninges pour grimper plus haut."
+    textStory: "L'extraterrestre du campement lui avait permis de s\u2019\xE9loigner
+      en lui offrant cette capacit\xE9 temporelle et en retour, il avait pu l\u2019aider.\nAlors,
+      qu\u2019il commen\xE7ait \xE0 en comprendre les subtilit\xE9s, il eut la sensation
+      qu\u2019il devrait se creuser les m\xE9ninges pour continuer \xE0 se frayer
+      un chemin."
   - prefab: {fileID: 8793353213195119226, guid: 0e3883558fc2f40cd9490104ec71c3ea, type: 3}
     audioClipMusic: {fileID: 8300000, guid: a200154d982bd4006a0b28b5b0d03f47, type: 3}
     audioClipAmbience: {fileID: 8300000, guid: 4ba1475fa9ae543d78789a70aac854aa, type: 3}
     textStory: "Il entendit un bruissement. L'extraterrestre du campement \xE9tait
       l\xE0, devant lui. Il semblait vouloir coop\xE9rer pour s\u2019\xE9chapper
-      ensemble. L\u2019environnement semblait changer aussi \xE0 son passage, mais
+      ensemble.\nL\u2019environnement semblait aussi changer \xE0 son passage, mais
       d\u2019une autre mani\xE8re."
   - prefab: {fileID: 8793353213195119226, guid: ded0cf607705a47d69f3a8533cb45512, type: 3}
     audioClipMusic: {fileID: 8300000, guid: a200154d982bd4006a0b28b5b0d03f47, type: 3}
     audioClipAmbience: {fileID: 8300000, guid: 4ba1475fa9ae543d78789a70aac854aa, type: 3}
     textStory: "L\u2019extraterrestre arm\xE9 apparut soudain devant eux. Il s\u2019\xE9tait
-      servi d\u2019Ethan pour trouver le campement de Evo. 20 ans plus t\xF4t, lors
-      de cette nuit funeste, il avait pour objectif de le capturer. Cette fois, il
-      semblait vouloir en finir..."
+      servi d\u2019Ethan pour trouver le campement.\nLors de cette nuit funeste,
+      20 ans plus t\xF4t, il avait pour mission de capturer Evo. Cette fois, il semblait
+      vouloir en finir avec lui..."
   - prefab: {fileID: 8793353213195119226, guid: 64ebe91db8417462d9048aba3579468d, type: 3}
     audioClipMusic: {fileID: 8300000, guid: 07e5adb14e6144d7aa829a6d8a66d3e6, type: 3}
     audioClipAmbience: {fileID: 0}
     textStory: "Ils purent s\u2019\xE9chapper sain et sauf mais plusieurs questions
-      restaient en suspens. Pour en d\xE9couvrir les r\xE9ponses, ajoutez Temporal
-      \xE0 votre liste de souhait, vous serez notifi\xE9 de la sortie officielle
+      restaient en suspens.\nPour en d\xE9couvrir les r\xE9ponses, ajoutez Temporal
+      \xE0 votre liste de souhait. Vous serez notifi\xE9 de la sortie officielle
       du jeu.\n\nMerci d\u2019avoir jou\xE9 !"
