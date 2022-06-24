@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -37,7 +38,16 @@ public class AgeParadoxBehavior : AgeBehavior {
         ParadoxAge = 0;
     }
 
-    public override bool SetCurrentAge(int age, bool animated = false, float durationSec = 0) {
+    public override bool SetCurrentAge(int age, bool animated = false, float durationSec = 0, Action onComplete = null) {
+        return OverrideCurrentAge(true, age, animated, durationSec, onComplete);
+    }
+
+    public bool OverrideCurrentAge(bool mustResolveParadoxes, int age, bool animated = false, float durationSec = 0, Action onComplete = null) {
+
+        if (!mustResolveParadoxes) {
+            //simple resolve
+            return base.SetCurrentAge(age, animated, durationSec, onComplete);
+        }
 
         if (IsInParadoxState && (age == ParadoxAge || age == CurrentAge)) {
             return false;
@@ -46,9 +56,9 @@ public class AgeParadoxBehavior : AgeBehavior {
         HideParadoxMeshes();
 
         var previousAge = PreviousAge;
-        var hasChanged = base.SetCurrentAge(age, animated, durationSec);
+        var hasChanged = base.SetCurrentAge(age, animated, durationSec, onComplete);
 
-        if (previousAge == CurrentAge && PreviousAge != CurrentAge) {// || (!hasChanged && PreviousAge == CurrentAge)) {
+        if (previousAge == CurrentAge && PreviousAge != CurrentAge) {
 
             //the object stay with the same age but displays the paradox of the previous age
             if (!ShowParadoxMesh(PreviousAge)) {

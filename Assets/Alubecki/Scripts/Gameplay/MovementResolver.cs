@@ -80,31 +80,35 @@ public class MovementResolver : MonoBehaviour {
 
     IEnumerator ResolveTemporalityAndGravity() {
 
-        //TEST METHOD WITHOUT ANIMS
+        var currentSnapshot = Game.Instance.boardBehavior.NewSnapshot();
+
         Game.Instance.temporalityManager.ComputeTemporalityAndGravity();
-        yield return new WaitForSeconds(0.1f);
+
+        var newSnapshot = Game.Instance.boardBehavior.NewSnapshot();
+        Game.Instance.boardBehavior.Restore(currentSnapshot);
+
+        yield return AnimateChangesToSnapshots((MementoSnapshotBoard)newSnapshot);
     }
-    /*
-        IEnumerator ResolveTemporalityAndGravity() {
 
-            var currentSnapshot = Game.Instance.memento.GetCurrentSnapshot();
+    IEnumerator AnimateChangesToSnapshots(MementoSnapshotBoard nextSnapshot) {
 
-            Game.Instance.temporalityManager.ComputeTemporalityAndGravity();
+        int nbAnims = 0;
 
-            var newSnapshot = Game.Instance.boardBehavior.CreateSnapshot();
-            Game.Instance.memento.Restore(currentSnapshot);
+        //find elemsnts by elem snapshot then animate changes
+        nextSnapshot.ProcessElements(
+            Game.Instance.boardBehavior.GetElements(),
+            (elem, elemSnapshot) => {
 
-            yield return AnimateChangesBetweenSnapshots(currentSnapshot, newSnapshot);
-        }*/
+                if (elem.AnimateChanges(elemSnapshot, 0.25f, () => nbAnims--)) {
+                    nbAnims++;
+                }
+            }
+        );
 
-    /*
-        IEnumerator AnimateChangesBetweenSnapshots(Snapshot previous, Snapshot next) {
-
-            //TODO
-
-            yield return new WaitWhile(() => nbAnims > 0);
-            yield return new WaitForSeconds(0.01f);
-        }*/
+        //wait until all anims have finished
+        yield return new WaitWhile(() => nbAnims > 0);
+        yield return new WaitForSeconds(0.01f);
+    }
 
     IEnumerator ResolveNPCMovements() {
 

@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 
 
-public class BoardBehavior : MonoBehaviour {
+public class BoardBehavior : MonoBehaviour, IMementoOriginator {
 
     /// <summary>
     /// Where are the ground blocks on y axis
@@ -157,6 +157,25 @@ public class BoardBehavior : MonoBehaviour {
 
         return GetElements()
             .Where(e => e.CanFall && !IsAnyWalkableElementUnderPos(e.GridPos));
+    }
+
+
+    public IMementoSnapshot NewSnapshot() {
+
+        var elemsSnapshots = GetElements().Select(e => (MementoSnapshotElement)e.NewSnapshot());
+        return new MementoSnapshotBoard(elemsSnapshots);
+    }
+
+    public void Restore(IMementoSnapshot snapshot) {
+
+        if (snapshot is not MementoSnapshotBoard) {
+            throw new ArgumentException("Wrong snapshot type, waiting for a MementoSnapshotBoard");
+        }
+
+        ((MementoSnapshotBoard)snapshot).ProcessElements(
+            GetElements(),
+            (elem, snapshot) => elem.Restore(snapshot)
+        );
     }
 
 }

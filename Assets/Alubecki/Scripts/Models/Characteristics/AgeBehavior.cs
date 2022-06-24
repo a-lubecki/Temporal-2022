@@ -103,6 +103,13 @@ public class AgeBehavior : MonoBehaviour {
         UpdateMeshesWithCurrentAge();
     }
 
+    public void InitCurrentAge(int currentAge) {
+
+        this.currentAge = currentAge;
+        PreviousAge = currentAge;
+        UpdateMeshesWithCurrentAge();
+    }
+
     protected bool AreAgesInSameAgeBounds(int age1, int age2) {
 
         foreach (var e in meshesByAgeBounds) {
@@ -120,7 +127,7 @@ public class AgeBehavior : MonoBehaviour {
         return AgeBounds.FindDataForAge(meshesByAgeBounds, age);
     }
 
-    public virtual bool SetCurrentAge(int age, bool animated = false, float durationSec = 0) {
+    public virtual bool SetCurrentAge(int age, bool animated = false, float durationSec = 0, Action onComplete = null) {
 
         if (currentAge == age) {
             //already the same age
@@ -141,7 +148,7 @@ public class AgeBehavior : MonoBehaviour {
         }
 
         //animate changes
-        coroutineAnimateAgeChanges = StartCoroutine(AnimateMeshesVisibility(PreviousAge, currentAge, durationSec));
+        coroutineAnimateAgeChanges = StartCoroutine(AnimateMeshesVisibility(PreviousAge, currentAge, durationSec, onComplete));
 
         return true;
     }
@@ -153,7 +160,7 @@ public class AgeBehavior : MonoBehaviour {
         PreviousAge = age;
     }
 
-    IEnumerator AnimateMeshesVisibility(int previousAge, int currentAge, float durationSec) {
+    IEnumerator AnimateMeshesVisibility(int previousAge, int currentAge, float durationSec, Action onComplete = null) {
 
         var previousTimeSec = 0f;
         var elapsedSec = 0f;
@@ -170,7 +177,7 @@ public class AgeBehavior : MonoBehaviour {
 
             //go forward or backward with step of 1 year
             var percentage = elapsedSec / durationSec;
-            if (percentage > 0) {
+            if (percentage > 1) {
                 percentage = 1;
             }
 
@@ -182,6 +189,8 @@ public class AgeBehavior : MonoBehaviour {
         UpdateMeshesWithAge(currentAge);
 
         coroutineAnimateAgeChanges = null;
+
+        onComplete?.Invoke();
     }
 
     public void UpdateMeshesWithCurrentAge() {

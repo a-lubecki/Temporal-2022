@@ -43,7 +43,7 @@ public class TemporalityManager : MonoBehaviour {
 
         var agesBeforeResolve = new Dictionary<BaseElementBehavior, int>();
         var positionsBeforeResolve = new Dictionary<BaseElementBehavior, Vector3>();
-        var paradoxPositionElements = new Dictionary<BaseElementBehavior, Vector3>();
+        var paradoxPositionElements = new List<BaseElementBehavior>();
 
         do {
             ResolveGravity(aboutToFallElements, positionsBeforeResolve, paradoxPositionElements);
@@ -74,14 +74,14 @@ public class TemporalityManager : MonoBehaviour {
         }
     }
 
-    void ResolveGravity(IEnumerable<BaseElementBehavior> aboutToFallElements, Dictionary<BaseElementBehavior, Vector3> positionsBeforeResolve, Dictionary<BaseElementBehavior, Vector3> paradoxPositionElements) {
+    void ResolveGravity(IEnumerable<BaseElementBehavior> aboutToFallElements, Dictionary<BaseElementBehavior, Vector3> positionsBeforeResolve, List<BaseElementBehavior> paradoxPositionElements) {
 
         foreach (var elem in aboutToFallElements) {
             ResolveGravityForElement(elem, positionsBeforeResolve, paradoxPositionElements);
         }
     }
 
-    void ResolveGravityForElement(BaseElementBehavior elem, Dictionary<BaseElementBehavior, Vector3> positionsBeforeResolve, Dictionary<BaseElementBehavior, Vector3> paradoxPositionElements) {
+    void ResolveGravityForElement(BaseElementBehavior elem, Dictionary<BaseElementBehavior, Vector3> positionsBeforeResolve, List<BaseElementBehavior> paradoxPositionElements) {
 
         var fallHeight = Game.Instance.boardBehavior.GetFallHeight(elem);
         if (fallHeight <= 0) {
@@ -94,7 +94,7 @@ public class TemporalityManager : MonoBehaviour {
 
         foreach (var e in elemsToFall) {
 
-            if (paradoxPositionElements != null && paradoxPositionElements.ContainsKey(e)) {
+            if (paradoxPositionElements != null && paradoxPositionElements.Contains(e)) {
                 //in paradox state, avoid an infinite loop
                 continue;
             }
@@ -108,7 +108,7 @@ public class TemporalityManager : MonoBehaviour {
         }
     }
 
-    public void ResolveTemporality(Dictionary<BaseElementBehavior, int> agesBeforeResolve, Dictionary<BaseElementBehavior, Vector3> positionsBeforeResolve, Dictionary<BaseElementBehavior, Vector3> paradoxPositionElements) {
+    public void ResolveTemporality(Dictionary<BaseElementBehavior, int> agesBeforeResolve, Dictionary<BaseElementBehavior, Vector3> positionsBeforeResolve, List<BaseElementBehavior> paradoxPositionElements) {
 
         var zones = GetZones();
         var agedElements = Game.Instance.boardBehavior.GetElements().Where(e => e.TryGetComponent<AgeBehavior>(out _));
@@ -139,7 +139,7 @@ public class TemporalityManager : MonoBehaviour {
         return elem.GetComponent<AgeParadoxBehavior>()?.IsInParadoxState ?? false;
     }
 
-    public void ResolveParadoxes(Dictionary<BaseElementBehavior, int> agesBeforeResolve, Dictionary<BaseElementBehavior, Vector3> positionsBeforeResolve, Dictionary<BaseElementBehavior, Vector3> paradoxPositionElements) {
+    public void ResolveParadoxes(Dictionary<BaseElementBehavior, int> agesBeforeResolve, Dictionary<BaseElementBehavior, Vector3> positionsBeforeResolve, List<BaseElementBehavior> paradoxPositionElements) {
 
         var zones = GetZones();
 
@@ -166,8 +166,8 @@ public class TemporalityManager : MonoBehaviour {
 
                     foreach (var eAbove in elementsAbove) {
 
-                        if (paradoxPositionElements != null && !paradoxPositionElements.ContainsKey(eAbove)) {
-                            paradoxPositionElements[eAbove] = eAbove.GridPos;
+                        if (paradoxPositionElements != null && !paradoxPositionElements.Contains(eAbove)) {
+                            paradoxPositionElements.Add(eAbove);
                         }
                     }
                 }
@@ -175,7 +175,7 @@ public class TemporalityManager : MonoBehaviour {
         }
     }
 
-    bool ResolveTemporalityForElement(BaseElementBehavior elem, IEnumerable<TemporalZoneBehavior> zones, Dictionary<BaseElementBehavior, Vector3> positionsBeforeResolve, Dictionary<BaseElementBehavior, Vector3> paradoxPositionElements) {
+    bool ResolveTemporalityForElement(BaseElementBehavior elem, IEnumerable<TemporalZoneBehavior> zones, Dictionary<BaseElementBehavior, Vector3> positionsBeforeResolve, List<BaseElementBehavior> paradoxPositionElements) {
 
         var totalAgeShift = 0;
 
@@ -204,7 +204,7 @@ public class TemporalityManager : MonoBehaviour {
         return false;
     }
 
-    void PushElementsAboveIfNecessary(BaseElementBehavior elem, AgeBehavior ageBehavior, Dictionary<BaseElementBehavior, Vector3> positionsBeforeResolve, Dictionary<BaseElementBehavior, Vector3> paradoxPositionElements) {
+    void PushElementsAboveIfNecessary(BaseElementBehavior elem, AgeBehavior ageBehavior, Dictionary<BaseElementBehavior, Vector3> positionsBeforeResolve, List<BaseElementBehavior> paradoxPositionElements) {
 
         var previousColliderHeight = elem.GetColliderHeightForAge(ageBehavior.PreviousAge);
         var nextColliderHeight = elem.GetColliderHeightForAge(ageBehavior.CurrentAge);
@@ -233,12 +233,12 @@ public class TemporalityManager : MonoBehaviour {
         //push all elements up at the same time with the same diff height
         foreach (var e in elementsToPush) {
 
-            if (paradoxPositionElements != null && paradoxPositionElements.ContainsKey(e)) {
+            if (paradoxPositionElements != null && paradoxPositionElements.Contains(e)) {
                 //avoid an infinite loop
                 continue;
             }
 
-            if (positionsBeforeResolve!= null && !positionsBeforeResolve.ContainsKey(e)) {
+            if (positionsBeforeResolve != null && !positionsBeforeResolve.ContainsKey(e)) {
                 positionsBeforeResolve.Add(e, e.GridPos);
             }
 

@@ -135,6 +135,8 @@ public class GameManager : MonoBehaviour {
     public void OnAnimateLevelShowEnd() {
 
         Game.Instance.inGameControlsBehavior.EnableControlsAfterDelay(0.1f);
+
+        Game.Instance.mementoCaretaker.SaveCurrentState();
     }
 
     public void OnSelectionStepBegin() {
@@ -209,9 +211,13 @@ public class GameManager : MonoBehaviour {
         Game.Instance.inGameControlsBehavior.EnableControls();
 
         Game.Instance.movementsSelectionBehavior.ClearNextMovement();
+
+        Game.Instance.mementoCaretaker.SaveCurrentState();
     }
 
     public void OnAnimateLevelHideBegin() {
+
+        Game.Instance.mementoCaretaker.Reset();
 
         Game.Instance.panelPileBehavior.Hide();
         Game.Instance.elementsSelectionBehavior.CancelSelection();

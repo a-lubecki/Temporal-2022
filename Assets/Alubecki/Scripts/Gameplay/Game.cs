@@ -15,6 +15,7 @@ public class Game : MonoBehaviourSingleton<Game> {
     public ElementsSelectionBehavior elementsSelectionBehavior;
     public MovementsSelectionBehavior movementsSelectionBehavior;
     public MovementResolver movementResolver;
+    public MementoCaretaker mementoCaretaker;
 
     public CameraController mainCameraController;
     public CinemachineVirtualCamera vcamWin;

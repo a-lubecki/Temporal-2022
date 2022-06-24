@@ -133,8 +133,8 @@ public class CameraController : MonoBehaviour {
 
     public float GetDollyTrackYPosition() => zoomLevel switch {
 
-        ZoomLevel.CLOSE => 20,
-        ZoomLevel.DEFAULT => 40,
+        ZoomLevel.CLOSE => 25,
+        ZoomLevel.DEFAULT => 50,
         ZoomLevel.FAR => 80,
         _ => throw new NotImplementedException()
     };

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2be7625bf66f443b2870a24f2b2935ea, type: 3}
   m_Name: DataCharacter.C2
   m_EditorClassIdentifier: 
-  <CharacterPrefab>k__BackingField: {fileID: -7421106753937211834, guid: 39f47f405bd694652aff13f5ebf1689a, type: 3}
+  <CharacterPrefab>k__BackingField: {fileID: -7421106753937211834, guid: 9143f90c7a3204dbbbd449f707a2f8d0, type: 3}
   <FullName>k__BackingField: Evo
   <Description>k__BackingField: He ran from other extraterrestrials 20 years ago
     and he's doing the same now.

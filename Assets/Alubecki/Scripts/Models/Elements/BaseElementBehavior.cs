@@ -1,9 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 
-public abstract class BaseElementBehavior : GridPosBehavior {
+public abstract class BaseElementBehavior : GridPosBehavior, IMementoOriginator {
 
 
     [SerializeField] bool preventFromWalkingOn;
@@ -33,6 +34,102 @@ public abstract class BaseElementBehavior : GridPosBehavior {
 
         //defensive copy
         return new List<BaseMovement.Factory>(PossibleMovements);
+    }
+
+
+    public IMementoSnapshot NewSnapshot() {
+
+        var ageBehavior = GetComponent<AgeBehavior>();
+        var ageParadoxBehavior = ageBehavior as AgeParadoxBehavior;
+
+        return new MementoSnapshotElement(
+            GetInstanceID(),
+            transform.localPosition,
+            transform.localRotation,
+            ageBehavior?.CurrentAge ?? 0,
+            ageParadoxBehavior?.IsInParadoxState ?? false,
+            ageParadoxBehavior?.ParadoxAge ?? 0
+        );
+    }
+
+    public void Restore(IMementoSnapshot snapshot) {
+
+        if (snapshot is not MementoSnapshotElement) {
+            throw new ArgumentException("Wrong snapshot type, waiting for a MementoSnapshotElement");
+        }
+
+        var s = (MementoSnapshotElement)snapshot;
+
+        transform.localPosition = s.localPos;
+        transform.localRotation = s.localRot;
+
+        GetComponent<AgeBehavior>()?.InitCurrentAge(s.age);
+    }
+
+    /// <summary>
+    /// Animate all differences between this elem and the snapshot.
+    /// Return if is animating or not.
+    /// </summary>
+    public bool AnimateChanges(MementoSnapshotElement snapshot, float durationSec, Action onComplete) {
+
+        var nbAnims = 0;
+
+        var pos = transform.localPosition;
+        if (pos.x != snapshot.localPos.x || pos.z != snapshot.localPos.z) {
+            throw new NotImplementedException("Animating move and jump not yet implemented");
+        }
+
+        if (pos.y != snapshot.localPos.y) {
+
+            nbAnims++;
+
+            //fall of move up
+            if (pos.y > snapshot.localPos.y) {
+                TryFall((int)(pos.y - snapshot.localPos.y), durationSec);
+            } else {
+                TryMoveUp((int)(snapshot.localPos.y - pos.y), durationSec);
+            }
+        }
+
+        if (transform.localRotation != snapshot.localRot) {
+            throw new NotImplementedException("Animating rotation not yet implemented");
+        }
+
+        if (TryGetComponent<AgeBehavior>(out var ageBehavior)) {
+
+            var ageParadoxBehavior = ageBehavior as AgeParadoxBehavior;
+
+            if (ageBehavior.CurrentAge != snapshot.age) {
+
+                nbAnims++;
+
+                //animate age without paradox
+                if (ageParadoxBehavior == null) {
+                    ageBehavior.SetCurrentAge(snapshot.age, true, durationSec);
+                } else {
+                    ageParadoxBehavior.OverrideCurrentAge(false, snapshot.age, true, durationSec);
+                }
+            }
+
+            //set paradox manually
+            if (ageParadoxBehavior != null && snapshot.isInParadoxState) {
+                ageParadoxBehavior.ClearParadoxState();
+                ageParadoxBehavior.ShowParadoxMesh(snapshot.ageInParadox);
+            }
+        }
+
+        if (onComplete != null) {
+            StartCoroutine(CompleteAnimateChangesAfterDelay(durationSec, onComplete));
+        }
+
+        return nbAnims > 0;
+    }
+
+    IEnumerator CompleteAnimateChangesAfterDelay(float durationSec, Action onComplete) {
+
+        yield return new WaitForSeconds(durationSec + 0.01f);
+
+        onComplete?.Invoke();
     }
 
 }

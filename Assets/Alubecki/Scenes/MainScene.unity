@@ -156,7 +156,7 @@ Transform:
   - {fileID: 1523327628}
   m_Father: {fileID: 742101544}
   m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 90, y: 45, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &853194
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -182,7 +182,7 @@ MonoBehaviour:
     OrthographicSize: 2
     NearClipPlane: 0.1
     FarClipPlane: 1000
-    Dutch: -45
+    Dutch: 0
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
@@ -245,7 +245,7 @@ Transform:
   - {fileID: 1430622079}
   - {fileID: 1098870684}
   m_Father: {fileID: 1770741991}
-  m_RootOrder: 8
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7899669
 MonoBehaviour:
@@ -428,7 +428,7 @@ Transform:
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1770741991}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &167011474
 MonoBehaviour:
@@ -1274,6 +1274,51 @@ MonoBehaviour:
   despawnedClones: []
   delays: []
   deactivatedChild: {fileID: 0}
+--- !u!1 &896131496
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 896131497}
+  - component: {fileID: 896131498}
+  m_Layer: 0
+  m_Name: Memento
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &896131497
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 896131496}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1770741991}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &896131498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 896131496}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84a101765903a417d83793296bd89814, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  goOriginator: {fileID: 1758675137}
 --- !u!1 &960052858
 GameObject:
   m_ObjectHideFlags: 0
@@ -1394,7 +1439,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1770741991}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 30, y: 0, z: 0}
 --- !u!114 &963194229
 MonoBehaviour:
@@ -1660,7 +1705,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1770741991}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1020797729
 MonoBehaviour:
@@ -2486,7 +2531,7 @@ Transform:
   - {fileID: 1434064538}
   - {fileID: 804098606}
   m_Father: {fileID: 1770741991}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1523327627
 GameObject:
@@ -2623,7 +2668,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dataChapter: {fileID: 11400000, guid: 17969691958074c26a285334aa79843f, type: 2}
-  nextLevelNumberToLoad: 8
+  nextLevelNumberToLoad: 4
   audioClipWin: {fileID: 8300000, guid: 2ebdca8ec63a3437996cf8b77861be12, type: 3}
   audioClipGameOverAmbience: {fileID: 8300000, guid: 8bebf1029361747c58d1fa6551885b20, type: 3}
 --- !u!1 &1610389907
@@ -2787,7 +2832,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1703429321}
-  m_LocalRotation: {x: 0.6532815, y: 0.27059805, z: -0.27059805, w: 0.6532815}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.0050000004, y: 0.005, z: 0.0050000004}
   m_ConstrainProportionsScale: 0
@@ -2795,7 +2840,7 @@ RectTransform:
   - {fileID: 34758960}
   m_Father: {fileID: 506903746}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 90, y: 45, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: -0.99}
@@ -3021,6 +3066,7 @@ Transform:
   - {fileID: 1548139065}
   - {fileID: 412514418}
   - {fileID: 1465088035}
+  - {fileID: 896131497}
   - {fileID: 167011473}
   - {fileID: 1020797728}
   - {fileID: 963194228}
@@ -3051,6 +3097,7 @@ MonoBehaviour:
   elementsSelectionBehavior: {fileID: 412514421}
   movementsSelectionBehavior: {fileID: 412514423}
   movementResolver: {fileID: 412514424}
+  mementoCaretaker: {fileID: 896131498}
   mainCameraController: {fileID: 963194230}
   vcamWin: {fileID: 853194}
   poolIndicationCharacterMove: {fileID: 2088138770}

@@ -26,6 +26,10 @@ public class GridPosBehavior : MonoBehaviour {
         return IsOriented(OrientationFunctions.FindOrientation(transform.localPosition, nextPos));
     }
 
+    public void SetOrientation(Orientation orientation) {
+        transform.localRotation = Quaternion.Euler(0, (int)orientation, 0);
+    }
+
     public bool IsOnGridPile(Vector2 horizontalPos) {
         return GridPosX == (int)horizontalPos.x && GridPosZ == (int)horizontalPos.y;
     }
@@ -51,7 +55,7 @@ public class GridPosBehavior : MonoBehaviour {
     }
 
     Tween DoOrientation(Vector3 nextPos, float durationSec) {
-        return transform.DORotate(new Vector3(0, (int)OrientationFunctions.FindOrientation(transform.localPosition, nextPos), 0), durationSec);
+        return transform.DOLocalRotate(new Vector3(0, (int)OrientationFunctions.FindOrientation(transform.localPosition, nextPos), 0), durationSec);
     }
 
     public virtual bool TryLookAt(Vector3 nextPos, float durationSec, Action onComplete = null) {
