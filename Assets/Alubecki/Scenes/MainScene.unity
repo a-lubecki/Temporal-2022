@@ -2516,8 +2516,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63534745b11aa4702828a34c7e2b1f31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dataChapter: {fileID: 11400000, guid: 17969691958074c26a285334aa79843f, type: 2}
-  nextLevelNumberToLoad: 4
+  dataChapter: {fileID: 11400000, guid: 2f07a0de9fd4b4ddc8b51efbaf67f4ab, type: 2}
+  nextLevelNumberToLoad: 2
   audioClipWin: {fileID: 8300000, guid: 2ebdca8ec63a3437996cf8b77861be12, type: 3}
   audioClipGameOverAmbience: {fileID: 8300000, guid: 8bebf1029361747c58d1fa6551885b20, type: 3}
   audioClipUndo: {fileID: 8300000, guid: c617fecd97cd64c8b84d01837a41e619, type: 3}
@@ -3320,7 +3320,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   team: 1
-  maxMovementsPerTurn: 1
+  maxMovementsPerTurn: 0.5
   maxMovementsPerCharacter: 1
 --- !u!4 &2020454826379402520 stripped
 Transform:
@@ -3465,11 +3465,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4089092585320693532, guid: 042b9547bb8f54c19835a37e226e143d, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 390.95
+      value: 309.4
       objectReference: {fileID: 0}
     - target: {fileID: 4089092585320693532, guid: 042b9547bb8f54c19835a37e226e143d, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 315.475
+      value: 274.7
       objectReference: {fileID: 0}
     - target: {fileID: 4089092585320693532, guid: 042b9547bb8f54c19835a37e226e143d, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -3493,7 +3493,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6520640153281045906, guid: 042b9547bb8f54c19835a37e226e143d, type: 3}
       propertyPath: m_SizeDelta.x
-      value: -1409.05
+      value: -1490.6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 042b9547bb8f54c19835a37e226e143d, type: 3}

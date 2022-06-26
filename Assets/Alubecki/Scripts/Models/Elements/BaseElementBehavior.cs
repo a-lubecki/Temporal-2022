@@ -95,16 +95,13 @@ public abstract class BaseElementBehavior : GridPosBehavior, IMementoOriginator 
         transform.localPosition = s.localPos;
         transform.localRotation = s.localRot;
 
-        var c = this as CharacterBehavior;
-        if (c != null) {
-            if (s.isDead) {
-                c.SetAsDead();
-            } else {
-                c.SetAsAlive();
-            }
-        }
-
         GetComponent<AgeBehavior>()?.InitCurrentAge(s.age);
+
+        RestoreInternal(s);
+    }
+
+    protected virtual void RestoreInternal(MementoSnapshotElement snapshot) {
+        //override if ncessary
     }
 
     /// <summary>

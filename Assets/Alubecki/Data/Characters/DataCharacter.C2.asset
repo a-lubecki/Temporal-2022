@@ -47,9 +47,10 @@ MonoBehaviour:
     value: 0
   - key: 20
     value: 3
-  - key: 150
+  - key: 170
     value: 0
   <AudioClipRotate>k__BackingField: {fileID: 8300000, guid: 293a4f66a92bd49cc97acf0ed4da3c4c, type: 3}
   <AudioClipMove>k__BackingField: {fileID: 8300000, guid: 4dcba79ebbbbb4504928666b6f0c206c, type: 3}
   <AudioClipClimb>k__BackingField: {fileID: 8300000, guid: d9275c39e911942cc96bce0b21325783, type: 3}
   <AudioClipFall>k__BackingField: {fileID: 8300000, guid: 142b7c7f9044040d08999507fa633bbe, type: 3}
+  <AudioClipBlasterAttack>k__BackingField: {fileID: 0}

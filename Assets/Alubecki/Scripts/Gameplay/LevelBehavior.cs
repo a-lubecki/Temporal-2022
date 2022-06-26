@@ -21,6 +21,9 @@ public class LevelBehavior : MonoBehaviour {
         IsFirstLevelOfChapter = levelNumber == 1;
         LevelNumber = levelNumber;
 
+        Game.Instance.aiTeamNeutral.InitAITeam(dataChapter.GetDataAINeutral(levelNumber));
+        Game.Instance.aiTeamEnemy.InitAITeam(dataChapter.GetDataAIEnemy(levelNumber));
+
         PlayMusic();
     }
 

@@ -25,11 +25,23 @@ MonoBehaviour:
     textStory: "Peu de randonneurs osaient p\xE9n\xE9trer dans cette for\xEAt car
       le chemin n\u2019\xE9tait pas balis\xE9. Il restait seulement d\u2019anciennes
       fournitures d\u2019exploitations foresti\xE8res abandonn\xE9es."
+    aiNeutral:
+      maxMovementsPerTurn: 1
+      maxMovementsPerCharacter: 1
+    aiEnemy:
+      maxMovementsPerTurn: 1
+      maxMovementsPerCharacter: 1
   - prefab: {fileID: 8793353213195119226, guid: a2c463457fa1c425fbeaea9b66843c6a, type: 3}
     audioClipMusic: {fileID: 8300000, guid: 8cde2c7b380634ceb849108e4e81cbb5, type: 3}
     audioClipAmbience: {fileID: 8300000, guid: 7ea35180419ee4824af0dc1f5800a2b9, type: 3}
     textStory: "Il aper\xE7ut quelque chose d\u2019inhabituel au loin, comme un campement.
       Il s\u2019y dirigea f\xE9brilement."
+    aiNeutral:
+      maxMovementsPerTurn: 1
+      maxMovementsPerCharacter: 1
+    aiEnemy:
+      maxMovementsPerTurn: 1
+      maxMovementsPerCharacter: 1
   - prefab: {fileID: 8793353213195119226, guid: b56c26ffe815944afa822173b52f9165, type: 3}
     audioClipMusic: {fileID: 0}
     audioClipAmbience: {fileID: 0}
@@ -37,12 +49,24 @@ MonoBehaviour:
       ici tout ce temps. \xC9tait-il ami ou ennemi ? \nUn tir de blaster le tira
       de sa torpeur. Un autre extraterrestre sortit d\u2019un buisson derri\xE8re
       lui. Il fallait fuir !"
+    aiNeutral:
+      maxMovementsPerTurn: 1
+      maxMovementsPerCharacter: 1
+    aiEnemy:
+      maxMovementsPerTurn: 1
+      maxMovementsPerCharacter: 1
   - prefab: {fileID: 8793353213195119226, guid: 1986e1a58fa4a49378afe0f2f83a405e, type: 3}
     audioClipMusic: {fileID: 8300000, guid: a200154d982bd4006a0b28b5b0d03f47, type: 3}
     audioClipAmbience: {fileID: 0}
     textStory: "Aucun des deux ne l\u2019avait suivi. Il reprit ses esprits et s'\xE9loigna
       de la zone.\nSoudain, il ressentit une sensation \xE9trange, comme si l'environnement
       changeait autour de lui."
+    aiNeutral:
+      maxMovementsPerTurn: 1
+      maxMovementsPerCharacter: 1
+    aiEnemy:
+      maxMovementsPerTurn: 1
+      maxMovementsPerCharacter: 1
   - prefab: {fileID: 8793353213195119226, guid: 6935391cb6ea54b2ea9ade8d740c50eb, type: 3}
     audioClipMusic: {fileID: 8300000, guid: a200154d982bd4006a0b28b5b0d03f47, type: 3}
     audioClipAmbience: {fileID: 8300000, guid: 7ea35180419ee4824af0dc1f5800a2b9, type: 3}
@@ -51,6 +75,12 @@ MonoBehaviour:
       que cela puisse para\xEEtre, l\u2019environnement vieillissait autour de lui.
       Il venait m\xEAme d\u2019assister \xE0 un \xE9trange paradoxe temporel en grimpant
       \xE0 c\xF4t\xE9 de ce buisson."
+    aiNeutral:
+      maxMovementsPerTurn: 1
+      maxMovementsPerCharacter: 1
+    aiEnemy:
+      maxMovementsPerTurn: 1
+      maxMovementsPerCharacter: 1
   - prefab: {fileID: 8793353213195119226, guid: e7d11af903d8b48d49e5bfb6b0e2fc76, type: 3}
     audioClipMusic: {fileID: 8300000, guid: a200154d982bd4006a0b28b5b0d03f47, type: 3}
     audioClipAmbience: {fileID: 8300000, guid: 4ba1475fa9ae543d78789a70aac854aa, type: 3}
@@ -59,6 +89,12 @@ MonoBehaviour:
       qu\u2019il commen\xE7ait \xE0 en comprendre les subtilit\xE9s, il eut la sensation
       qu\u2019il devrait se creuser les m\xE9ninges pour continuer \xE0 se frayer
       un chemin."
+    aiNeutral:
+      maxMovementsPerTurn: 1
+      maxMovementsPerCharacter: 1
+    aiEnemy:
+      maxMovementsPerTurn: 1
+      maxMovementsPerCharacter: 1
   - prefab: {fileID: 8793353213195119226, guid: 0e3883558fc2f40cd9490104ec71c3ea, type: 3}
     audioClipMusic: {fileID: 8300000, guid: a200154d982bd4006a0b28b5b0d03f47, type: 3}
     audioClipAmbience: {fileID: 8300000, guid: 4ba1475fa9ae543d78789a70aac854aa, type: 3}
@@ -66,6 +102,12 @@ MonoBehaviour:
       l\xE0, devant lui. Il semblait vouloir coop\xE9rer pour s\u2019\xE9chapper
       ensemble.\nL\u2019environnement semblait aussi changer \xE0 son passage, mais
       d\u2019une autre mani\xE8re."
+    aiNeutral:
+      maxMovementsPerTurn: 1
+      maxMovementsPerCharacter: 1
+    aiEnemy:
+      maxMovementsPerTurn: 1
+      maxMovementsPerCharacter: 1
   - prefab: {fileID: 8793353213195119226, guid: ded0cf607705a47d69f3a8533cb45512, type: 3}
     audioClipMusic: {fileID: 8300000, guid: a200154d982bd4006a0b28b5b0d03f47, type: 3}
     audioClipAmbience: {fileID: 8300000, guid: 4ba1475fa9ae543d78789a70aac854aa, type: 3}
@@ -73,6 +115,12 @@ MonoBehaviour:
       servi d\u2019Ethan pour trouver le campement.\nLors de cette nuit funeste,
       20 ans plus t\xF4t, il avait pour mission de capturer Evo. Cette fois, il semblait
       vouloir en finir avec lui..."
+    aiNeutral:
+      maxMovementsPerTurn: 1
+      maxMovementsPerCharacter: 1
+    aiEnemy:
+      maxMovementsPerTurn: 1
+      maxMovementsPerCharacter: 1
   - prefab: {fileID: 8793353213195119226, guid: 64ebe91db8417462d9048aba3579468d, type: 3}
     audioClipMusic: {fileID: 8300000, guid: 07e5adb14e6144d7aa829a6d8a66d3e6, type: 3}
     audioClipAmbience: {fileID: 0}
@@ -80,3 +128,9 @@ MonoBehaviour:
       restaient en suspens.\nPour en d\xE9couvrir les r\xE9ponses, ajoutez Temporal
       \xE0 votre liste de souhait. Vous serez notifi\xE9 de la sortie officielle
       du jeu.\n\nMerci d\u2019avoir jou\xE9 !"
+    aiNeutral:
+      maxMovementsPerTurn: 1
+      maxMovementsPerCharacter: 1
+    aiEnemy:
+      maxMovementsPerTurn: 0.5
+      maxMovementsPerCharacter: 1

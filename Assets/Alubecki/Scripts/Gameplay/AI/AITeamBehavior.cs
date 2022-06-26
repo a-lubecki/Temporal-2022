@@ -18,6 +18,16 @@ public class AITeamBehavior : MonoBehaviour {
     int lastTurnWithMovement;
 
 
+    public void InitAITeam(DataAITeam aiTeam) {
+
+        if (aiTeam == null) {
+            return;
+        }
+
+        maxMovementsPerTurn = aiTeam.MaxMovementsPerTurn;
+        maxMovementsPerCharacter = aiTeam.MaxMovementsPerCharacter;
+    }
+
     public void ComputeNextNPCsMovements() {
 
         if (maxMovementsPerTurn <= 0) {
@@ -45,7 +55,7 @@ public class AITeamBehavior : MonoBehaviour {
         }
 
         //manage movements every X turns
-        if (maxMovementsPerTurn <= 0) {
+        if (maxMovementsPerTurn <= 1) {
 
             //if max per turn is 0.5 : 1/0.5 = 2 : 1 movement every 2 turns
             var turnsFrequency = 1 / maxMovementsPerTurn;

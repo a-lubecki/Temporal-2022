@@ -39,6 +39,7 @@ public class CharacterBehavior : BaseElementBehavior {
     public override bool IsCursorAboveElement => false;
     public override bool CanBeSelected => Team == Team.ALLY;
     public override bool IsPhysicallyWalkableOverBlock => false;
+    public override bool IsTheoricallyWalkableOverBlock => false;
     public override bool CanMove => IsAlive && !IsGrabbing;
     public override bool CanMoveOverInvisibleBlocks => IsNPC;//spcial case for NPCs, they can walk on invisible blocks
     public override bool CanFall => true;
@@ -386,6 +387,18 @@ public class CharacterBehavior : BaseElementBehavior {
         Game.Instance.audioManager.PlaySimpleSound(AudioClipBlasterAttack);
 
         CallOnComplete(s, onComplete);
+    }
+
+    protected override void RestoreInternal(MementoSnapshotElement snapshot) {
+        base.RestoreInternal(snapshot);
+
+        if (snapshot.isDead) {
+            SetAsDead();
+        } else {
+            SetAsAlive();
+        }
+
+        UpdateCharacteristicsWithCurrentAge();
     }
 
 }

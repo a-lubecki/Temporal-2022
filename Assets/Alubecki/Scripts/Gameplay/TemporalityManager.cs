@@ -54,14 +54,14 @@ public class TemporalityManager : MonoBehaviour {
             ResolveParadoxes(agesBeforeResolve, positionsBeforeResolve, paradoxPositionElements);
 
             nbLoops++;
-
+            Debug.LogWarning("nbLoops : " + nbLoops);
             if (nbLoops >= 3) {
                 break;
             }
 
             aboutToFallElements = GetAboutToFallElements();
 
-        } while (aboutToFallElements.Count() > 0);
+        } while (nbLoops >= 3 || aboutToFallElements.Count() > 0);
     }
 
     IEnumerable<BaseElementBehavior> GetAboutToFallElements() {
@@ -82,7 +82,7 @@ public class TemporalityManager : MonoBehaviour {
     }
 
     void ResolveGravity(IEnumerable<BaseElementBehavior> aboutToFallElements, Dictionary<BaseElementBehavior, Vector3> positionsBeforeResolve, List<BaseElementBehavior> paradoxPositionElements) {
-
+Debug.Log("ResolveGravity : " + aboutToFallElements.Count());
         foreach (var elem in aboutToFallElements) {
             ResolveGravityForElement(elem, positionsBeforeResolve, paradoxPositionElements);
         }

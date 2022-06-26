@@ -43,7 +43,7 @@ public class AgeParadoxBehavior : AgeBehavior {
     }
 
     public bool OverrideCurrentAge(bool mustResolveParadoxes, int age, bool animated = false, float durationSec = 0, Action onComplete = null) {
-
+if (name == "Bush (5)") Debug.LogWarning("OverrideCurrentAge");
         if (!mustResolveParadoxes) {
             //simple resolve
             return base.SetCurrentAge(age, animated, durationSec, onComplete);

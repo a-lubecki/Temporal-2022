@@ -5,7 +5,7 @@ using UnityEngine;
 public class AIDeciderFollow : BaseAIDecider {
 
 
-    [SerializeField] Transform trTarget;
+    [SerializeField] protected Transform trTarget;
 
 
     public override BaseMovement NewMovement(CharacterBehavior character) {
@@ -58,7 +58,7 @@ public class AIDeciderFollow : BaseAIDecider {
     /// Simple distance calculation for the demo.
     /// Should be replaced by a real pathfinding algo in the final game.
     /// </summary>
-    float CalculateMinDistanceToTarget(Vector2 origin, Vector2 target) {
+    protected float CalculateMinDistanceToTarget(Vector2 origin, Vector2 target) {
         return Vector3.Distance(origin, target);
     }
 

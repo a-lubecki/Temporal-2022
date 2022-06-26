@@ -41,15 +41,36 @@ public class DataChapter : ScriptableObject {
         return GetLevel(levelNumber).prefab;
     }
 
+    public DataAITeam GetDataAINeutral(int levelNumber) {
+        return GetLevel(levelNumber).aiNeutral;
+    }
+
+    public DataAITeam GetDataAIEnemy(int levelNumber) {
+        return GetLevel(levelNumber).aiEnemy;
+    }
+
 }
 
 
 [Serializable]
-struct DataLevel {
+class DataLevel {
 
     public GameObject prefab;
     public AudioClip audioClipMusic;
     public AudioClip audioClipAmbience;
     [TextArea(5, 10)] public string textStory;
+    public DataAITeam aiNeutral;
+    public DataAITeam aiEnemy;
+
+}
+
+[Serializable]
+public class DataAITeam {
+
+    [SerializeField] float maxMovementsPerTurn = 1;
+    [SerializeField] int maxMovementsPerCharacter = 1;
+
+    public float MaxMovementsPerTurn => maxMovementsPerTurn;
+    public int MaxMovementsPerCharacter => maxMovementsPerCharacter;
 
 }
