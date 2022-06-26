@@ -31,6 +31,7 @@ public class AgeBehavior : MonoBehaviour {
     public bool IsAnimatingAgeChange => coroutineAnimateAgeChanges != null;
     public bool HasReachMaxAge => currentAge >= maxAge;
     public string DisplayableText => "<b>Age:</b> " + currentAge;
+    public bool AreMeshesEnabled { get; private set; }
 
 
     protected virtual void Awake() {
@@ -193,6 +194,12 @@ public class AgeBehavior : MonoBehaviour {
         onComplete?.Invoke();
     }
 
+    public void SetMeshesEnabled(bool enabled) {
+
+        AreMeshesEnabled = enabled;
+        UpdateMeshesWithCurrentAge();
+    }
+
     public void UpdateMeshesWithCurrentAge() {
         UpdateMeshesWithAge(currentAge);
     }
@@ -201,7 +208,7 @@ public class AgeBehavior : MonoBehaviour {
 
         //only activate the mesh for current age
         foreach (var e in meshesByAgeBounds) {
-            e.Value.SetActive(e.Key.IsInBounds(age));
+            e.Value.SetActive(AreMeshesEnabled && e.Key.IsInBounds(age));
         }
     }
 

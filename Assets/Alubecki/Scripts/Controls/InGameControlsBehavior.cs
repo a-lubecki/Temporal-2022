@@ -109,6 +109,7 @@ public class InGameControlsBehavior : BaseControlsBehavior {
 
     //callback from PlayerInput
     void OnPreviousNextMovement(InputValue v) {
+        
         MustGoToPreviousNextMovement = true;
         IsPreviousMovement = (v.Get<float>() < 0);
     }

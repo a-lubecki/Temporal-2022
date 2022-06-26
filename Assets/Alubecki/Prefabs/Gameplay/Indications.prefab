@@ -109,13 +109,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af20f0a9dc61943cea0db2854d5eab85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameManager: {fileID: 0}
-  poolIndicationCharacterMove: {fileID: 0}
-  poolIndicationMovableObjectMove: {fileID: 0}
-  poolIndicationNPCAction: {fileID: 0}
   trIndicationsCharacterMove: {fileID: 5029874724743472054}
   trIndicationsMovableObjectMove: {fileID: 5029874724990557361}
-  trIndicationsNPCAction: {fileID: 5029874725572615450}
+  trIndicationsNPCMovement: {fileID: 5029874725572615450}
 --- !u!1 &5029874725572615525
 GameObject:
   m_ObjectHideFlags: 0
@@ -126,7 +122,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5029874725572615450}
   m_Layer: 0
-  m_Name: NPCAction
+  m_Name: NPCMovement
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

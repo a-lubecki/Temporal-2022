@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -8,7 +7,13 @@ using UnityEngine;
 public class MovementResolver : MonoBehaviour {
 
 
+    public const float DURATION_ANIM_TEMPORALITY_CHANGE_SEC = 0.1f;
+
+
     public bool IsResolvingMovement { get; private set; }
+
+    //a value stored in memory to avoid same computations every time
+    bool hasFoundAnyPlayerDefinitelyDead;
 
 
     public void InitLevel(Action onComplete) {
@@ -51,17 +56,43 @@ public class MovementResolver : MonoBehaviour {
         IsResolvingMovement = false;
     }
 
-    IEnumerator ResolveMovementConsequences(Action onComplete) {
+    /// <summary>
+    /// If any player character dead, invoke oncomplete and return true
+    /// </summary>
+    bool InterruptIfAnyCharacterDead(Action onComplete) {
 
-        yield return ResolveTemporalityAndGravity();
-
-        yield return ResolveNPCMovements();
-
-        if (IsAnyPlayerCharacterDefinitelyDead()) {
+        if (hasFoundAnyPlayerDefinitelyDead) {
 
             Game.Instance.gameManager.TriggerEnd(true);
             onComplete?.Invoke();
+            return true;
+        }
 
+        return false;
+    }
+
+    IEnumerator ResolveMovementConsequences(Action onComplete) {
+
+        //reset cached value
+        hasFoundAnyPlayerDefinitelyDead = false;
+
+        yield return ResolveNPCsAttacks();
+        if (InterruptIfAnyCharacterDead(onComplete)) {
+            yield break;
+        }
+
+        yield return ResolveTemporalityAndGravity();
+        if (InterruptIfAnyCharacterDead(onComplete)) {
+            yield break;
+        }
+
+        yield return ResolveNPCsMovements(Game.Instance.aiTeamNeutral);
+        if (InterruptIfAnyCharacterDead(onComplete)) {
+            yield break;
+        }
+
+        yield return ResolveNPCsMovements(Game.Instance.aiTeamEnemy);
+        if (InterruptIfAnyCharacterDead(onComplete)) {
             yield break;
         }
 
@@ -72,8 +103,6 @@ public class MovementResolver : MonoBehaviour {
 
             yield break;
         }
-
-        DisplayAllNextNPCMovements();
 
         onComplete?.Invoke();
     }
@@ -99,7 +128,7 @@ public class MovementResolver : MonoBehaviour {
             Game.Instance.boardBehavior.GetElements(),
             (elem, elemSnapshot) => {
 
-                if (elem.AnimateChanges(elemSnapshot, 0.25f, () => nbAnims--)) {
+                if (elem.AnimateChanges(elemSnapshot, DURATION_ANIM_TEMPORALITY_CHANGE_SEC, () => nbAnims--)) {
                     nbAnims++;
                 }
             }
@@ -110,63 +139,76 @@ public class MovementResolver : MonoBehaviour {
         yield return new WaitForSeconds(0.01f);
     }
 
-    IEnumerator ResolveNPCMovements() {
+    IEnumerator ResolveNPCsMovements(AITeamBehavior aiTeam) {
 
-        var nextNPCMovement = GetNextNPCMovement();
+        var nextNPCMovement = aiTeam.AdvanceToNextAvailableNPCMovement();
 
         while (nextNPCMovement != null) {
 
-            //free the movement to get anothe NPC movement to execute next time
-            ClearNPCMovement(nextNPCMovement);
+            if (nextNPCMovement.CanExecute()) {
 
-            //execute movement and convert execute callback in "coroutine wait" to stay in curent coroutine
-            var isMovementExecuted = false;
-            nextNPCMovement.Execute(() => isMovementExecuted = true);
+                //execute movement and convert execute callback in "coroutine wait" to stay in curent coroutine
+                var isMovementExecuted = false;
+                nextNPCMovement.Execute(() => isMovementExecuted = true);
 
-            yield return new WaitUntil(() => isMovementExecuted);
+                yield return new WaitUntil(() => isMovementExecuted);
 
-            yield return ResolveTemporalityAndGravity();
-
-            if (IsAnyPlayerCharacterDefinitelyDead()) {
-                //stop now, game over will be triggered outside this method
-                yield break;
-            }
-
-            //resolve attacks, it can lead to game over
-            while (IsRemainingAnyNPCAttack()) {
-
-                yield return ResolveNextNPCAttack();
+                yield return ResolveTemporalityAndGravity();
 
                 if (IsAnyPlayerCharacterDefinitelyDead()) {
                     //stop now, game over will be triggered outside this method
+                    hasFoundAnyPlayerDefinitelyDead = true;
                     yield break;
                 }
+
+            } else {
+
+                Debug.Log("NPC movement couldn't be executed: " + nextNPCMovement);
             }
 
-            nextNPCMovement = GetNextNPCMovement();
+            yield return ResolveNPCsAttacks();
+            if (hasFoundAnyPlayerDefinitelyDead) {
+                yield break;
+            }
+
+            nextNPCMovement = aiTeam.AdvanceToNextAvailableNPCMovement();
         }
     }
 
-    BaseMovement GetNextNPCMovement() {
-        return null;//TODO
+    IEnumerator ResolveNPCsAttacks() {
+
+        yield return ResolveNPCsAttacks(Game.Instance.aiTeamEnemy);
+        if (hasFoundAnyPlayerDefinitelyDead) {
+            yield break;
+        }
+
+        yield return ResolveNPCsAttacks(Game.Instance.aiTeamNeutral);
     }
 
-    void ClearNPCMovement(BaseMovement movement) {
-        //TODO
-    }
+    IEnumerator ResolveNPCsAttacks(AITeamBehavior aiTeam) {
 
-    bool IsRemainingAnyNPCAttack() {
-        return false;//TODO
-    }
+        //reset attack flags before launching algo, flag is useful to avoid infinite algo in certain cases
+        aiTeam.ResetNPCAttackFlags();
 
-    IEnumerator ResolveNextNPCAttack() {
+        //resolve attacks, it can lead to game over
+        var attackingNPC = aiTeam.GetRemainingNPCWithAttack();
+        while (attackingNPC != null) {
 
-        yield break;//TODO
+            yield return attackingNPC.Attack();
+
+            if (IsAnyPlayerCharacterDefinitelyDead()) {
+                //stop now, game over will be triggered outside this method
+                hasFoundAnyPlayerDefinitelyDead = true;
+                yield break;
+            }
+
+            attackingNPC = aiTeam.GetRemainingNPCWithAttack();
+        }
     }
 
     bool IsAnyPlayerCharacterDefinitelyDead() {
 
-        return Game.Instance.boardBehavior.GetElements()
+        return hasFoundAnyPlayerDefinitelyDead || Game.Instance.boardBehavior.GetElements()
             .Any(e => e.TryGetComponent<CharacterBehavior>(out var character) && character.IsPlayable && character.IsDefinitelyDead);
     }
 
@@ -181,10 +223,6 @@ public class MovementResolver : MonoBehaviour {
 
         return Game.Instance.boardBehavior.GetElemsOnPos(pos)
             .Any(e => e.TryGetComponent<GoalBehavior>(out _));
-    }
-
-    void DisplayAllNextNPCMovements() {
-        //TODO
     }
 
 }

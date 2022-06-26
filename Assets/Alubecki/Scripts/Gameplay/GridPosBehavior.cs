@@ -6,6 +6,9 @@ using UnityEngine;
 public class GridPosBehavior : MonoBehaviour {
 
 
+    public const float ANIM_WAIT_BEFORE_CALLBACK_SEC = 0.01f;
+
+
     public Orientation Orientation => OrientationFunctions.FindOrientation(transform.localRotation.eulerAngles.y);
 
     public Vector3Int GridPos => Vector3Int.RoundToInt(transform.localPosition);
@@ -71,11 +74,7 @@ public class GridPosBehavior : MonoBehaviour {
         //look at
         s.Append(DoOrientation(nextPos, durationSec));
 
-        //callback if necessary
-        if (onComplete != null) {
-            s.AppendInterval(0.01f)
-                .OnComplete(() => onComplete.Invoke());
-        }
+        CallOnComplete(s, onComplete);
 
         return true;
     }
@@ -93,17 +92,13 @@ public class GridPosBehavior : MonoBehaviour {
         //look at if necessary
         if (autoRotateBefore && !IsOriented(nextPos)) {
             DoOrientation(nextPos, rotateDurationSec);
-            s.AppendInterval(0.8f * rotateDurationSec);
+            s.AppendInterval(0.5f * rotateDurationSec);
         }
 
         //move
         s.Append(transform.DOLocalMove(Vector3Int.RoundToInt(nextPos), durationSec).SetEase(Ease.InOutQuad));
 
-        //callback if necessary
-        if (onComplete != null) {
-            s.AppendInterval(0.01f)
-                .OnComplete(() => onComplete.Invoke());
-        }
+        CallOnComplete(s, onComplete);
 
         return true;
     }
@@ -121,7 +116,7 @@ public class GridPosBehavior : MonoBehaviour {
         //look at if necessary
         if (autoRotateBefore && !IsOnGridPos(nextPos) && !IsOriented(nextPos)) {
             DoOrientation(nextPos, rotateDurationSec);
-            s.AppendInterval(0.8f * rotateDurationSec);
+            s.AppendInterval(0.5f * rotateDurationSec);
         }
 
         var jumpHeight = 0.1f;
@@ -133,11 +128,7 @@ public class GridPosBehavior : MonoBehaviour {
         //jump
         s.Append(transform.DOLocalJump(Vector3Int.RoundToInt(nextPos), jumpHeight, 1, durationSec));
 
-        //callback if necessary
-        if (onComplete != null) {
-            s.AppendInterval(0.01f)
-                .OnComplete(() => onComplete.Invoke());
-        }
+        CallOnComplete(s, onComplete);
 
         return true;
     }
@@ -158,11 +149,7 @@ public class GridPosBehavior : MonoBehaviour {
 
         s.Append(transform.DOLocalMove(GridPos + Vector3.down * fallHeight, durationSec).SetEase(Ease.OutBounce));
 
-        //callback if necessary
-        if (onComplete != null) {
-            s.AppendInterval(0.01f)
-                .OnComplete(() => onComplete.Invoke());
-        }
+        CallOnComplete(s, onComplete);
 
         return true;
     }
@@ -183,13 +170,20 @@ public class GridPosBehavior : MonoBehaviour {
 
         s.Append(transform.DOLocalMove(GridPos + Vector3.up * height, durationSec).SetEase(Ease.OutBack));
 
-        //callback if necessary
-        if (onComplete != null) {
-            s.AppendInterval(0.01f)
-                .OnComplete(() => onComplete.Invoke());
-        }
+        CallOnComplete(s, onComplete);
 
         return true;
+    }
+
+    protected void CallOnComplete(Sequence s, Action onComplete) {
+
+        if (onComplete == null) {
+            return;
+        }
+
+        //callback if necessary
+        s.AppendInterval(ANIM_WAIT_BEFORE_CALLBACK_SEC)
+                .OnComplete(() => onComplete());
     }
 
 }

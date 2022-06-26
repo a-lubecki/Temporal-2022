@@ -6,7 +6,7 @@ using UnityEngine;
 public class MovementPushPull : BaseMovement {
 
 
-    const float DURATION_ANIM_MOVE_SEC = 0.5f;
+    public const float DURATION_ANIM_PUSH_SEC = 0.4f;
 
 
     public override bool NeedsMovementResolving => true;
@@ -14,7 +14,7 @@ public class MovementPushPull : BaseMovement {
     Vector3 nextMovableObjectPos;
 
 
-    public MovementPushPull(MovementType movementType, BaseElementBehavior owner, Vector3 nextPos, Vector3 nextMovableObjectPos) : base(movementType, owner, nextPos) {
+    public MovementPushPull(BaseMovement.Factory originalFactory, MovementType movementType, BaseElementBehavior owner, Vector3 nextPos, Vector3 nextMovableObjectPos) : base(originalFactory, movementType, owner, nextPos) {
         this.nextMovableObjectPos = nextMovableObjectPos;
     }
 
@@ -57,22 +57,22 @@ public class MovementPushPull : BaseMovement {
         }
 
         if (!character.CanPushOrPullMovableObject(movableObject)) {
-            character.FailPushPull(character.GridPos, DURATION_ANIM_MOVE_SEC, onComplete);
+            character.FailPushPull(character.GridPos, DURATION_ANIM_PUSH_SEC, onComplete);
             return;
         }
 
-        movableObject.TryMove(nextMovableObjectPos, DURATION_ANIM_MOVE_SEC);
+        movableObject.TryMove(nextMovableObjectPos, DURATION_ANIM_PUSH_SEC);
 
         //move all objects over the current
         foreach (var elem in Game.Instance.boardBehavior.GetSortedElementsAbove(movableObject)) {
 
             if (elem is MovableObjectBehavior || elem is CharacterBehavior) {
                 var nextPos = new Vector3(nextMovableObjectPos.x, elem.GridPosY, nextMovableObjectPos.z);
-                elem.TryMove(nextPos, DURATION_ANIM_MOVE_SEC, null);
+                elem.TryMove(nextPos, DURATION_ANIM_PUSH_SEC, null);
             }
         }
 
-        character.TryPushPull(NextPos, DURATION_ANIM_MOVE_SEC, onComplete);
+        character.TryPushPull(NextPos, DURATION_ANIM_PUSH_SEC, onComplete);
     }
 
 
@@ -136,7 +136,7 @@ public class MovementPushPull : BaseMovement {
 
             var nextMovableObjectPos = (nextPos == movableObject.GridPos) ? GetMovableObjectPosAfterPush(character.GridPos, movableObject.GridPos) : character.GridPos;
 
-            return new MovementPushPull(MovementType, owner, nextPos, nextMovableObjectPos);
+            return new MovementPushPull(this, MovementType, owner, nextPos, nextMovableObjectPos);
         }
 
         Vector3 GetMovableObjectPosAfterPush(Vector3 characterGridPos, Vector3 movableObjectGridPos) {

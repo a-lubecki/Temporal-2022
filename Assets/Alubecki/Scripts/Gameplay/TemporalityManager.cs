@@ -37,7 +37,7 @@ public class TemporalityManager : MonoBehaviour {
 
         ClearParadoxes();
 
-        var aboutToFallElements = Game.Instance.boardBehavior.GetAboutToFallElements();
+        var aboutToFallElements = GetAboutToFallElements();
 
         var nbLoops = 0;
 
@@ -59,9 +59,16 @@ public class TemporalityManager : MonoBehaviour {
                 break;
             }
 
-            aboutToFallElements = Game.Instance.boardBehavior.GetAboutToFallElements();
+            aboutToFallElements = GetAboutToFallElements();
 
         } while (aboutToFallElements.Count() > 0);
+    }
+
+    IEnumerable<BaseElementBehavior> GetAboutToFallElements() {
+
+        var board = Game.Instance.boardBehavior;
+        return board.GetElements()
+            .Where(e => e.CanFall && !board.IsAnyWalkableElementUnderPos(e.GridPos, e.CanMoveOverInvisibleBlocks));
     }
 
     void ClearParadoxes() {
@@ -83,7 +90,7 @@ public class TemporalityManager : MonoBehaviour {
 
     void ResolveGravityForElement(BaseElementBehavior elem, Dictionary<BaseElementBehavior, Vector3> positionsBeforeResolve, List<BaseElementBehavior> paradoxPositionElements) {
 
-        var fallHeight = Game.Instance.boardBehavior.GetFallHeight(elem);
+        var fallHeight = Game.Instance.boardBehavior.GetFallHeight(elem, elem.CanMoveOverInvisibleBlocks);
         if (fallHeight <= 0) {
             //no changes
             return;
@@ -112,10 +119,7 @@ public class TemporalityManager : MonoBehaviour {
 
         var zones = GetZones();
         var agedElements = Game.Instance.boardBehavior.GetElements().Where(e => e.TryGetComponent<AgeBehavior>(out _));
-        /*
-                var agedElemsByAges = agedElements.Select(e => new KeyValuePair<BaseElementBehavior, int>(e, e.GetComponent<AgeBehavior>().CurrentAge));
-                ResolveParadoxesInternal(agedElemsByAges.ToDictionary(e => e.Key, e => e.Value));
-        */
+
         foreach (var elem in agedElements) {
 
             if (IsInParadoxState(elem)) {

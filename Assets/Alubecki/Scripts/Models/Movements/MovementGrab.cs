@@ -11,7 +11,7 @@ public class MovementGrab : BaseMovement {
     public override bool NeedsMovementResolving => false;
 
 
-    public MovementGrab(MovementType movementType, BaseElementBehavior owner, Vector3 nextPos) : base(movementType, owner, nextPos) {
+    public MovementGrab(BaseMovement.Factory originalFactory, MovementType movementType, BaseElementBehavior owner, Vector3 nextPos) : base(originalFactory, movementType, owner, nextPos) {
     }
 
     public override IEnumerable<DisplayableMovementInfo> NewDisplayableMovementInfos() {
@@ -34,7 +34,7 @@ public class MovementGrab : BaseMovement {
             return;
         }
 
-        (owner as CharacterBehavior)?.GrabMovableObject(movableObject as MovableObjectBehavior, true, onComplete, 0.1f);
+        (owner as CharacterBehavior)?.GrabMovableObject(movableObject as MovableObjectBehavior, true, onComplete, MovementSimpleMove.DURATION_ANIM_AUTOROTATE_SEC);
     }
 
 
@@ -66,7 +66,7 @@ public class MovementGrab : BaseMovement {
         }
 
         public override BaseMovement NewMovement(BaseElementBehavior owner, Vector3 nextPos) {
-            return new MovementGrab(MovementType, owner, nextPos);
+            return new MovementGrab(this, MovementType, owner, nextPos);
         }
 
     }

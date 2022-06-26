@@ -8,12 +8,12 @@ public class MovementJumpHigh : MovementClimb {
     public override string DisplayableName => IsClimbingUp ? "Jump up" : "Jump down";
 
 
-    public MovementJumpHigh(MovementType movementType, BaseElementBehavior owner, Vector3 nextPos) : base(movementType, owner, nextPos) {
+    public MovementJumpHigh(BaseMovement.Factory originalFactory, MovementType movementType, BaseElementBehavior owner, Vector3 nextPos) : base(originalFactory, movementType, owner, nextPos) {
     }
 
     protected override void ExecuteInternal(BaseElementBehavior owner, Action onComplete) {
-
-        (owner as CharacterBehavior)?.TryJump(NextPos, 0.25f, onComplete, true, 0.1f);
+        //replace movement: no base method call
+        (owner as CharacterBehavior)?.TryJump(NextPos, DURATION_ANIM_CLIMB_SEC, onComplete, true, DURATION_ANIM_AUTOROTATE_SEC);
     }
 
 
@@ -27,7 +27,7 @@ public class MovementJumpHigh : MovementClimb {
         }
 
         public override BaseMovement NewMovement(BaseElementBehavior owner, Vector3 nextPos) {
-            return new MovementJumpHigh(MovementType, owner, nextPos);
+            return new MovementJumpHigh(this, MovementType, owner, nextPos);
         }
 
     }

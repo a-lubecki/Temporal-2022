@@ -12,6 +12,8 @@ public class GameManager : MonoBehaviour {
 
     [SerializeField] AudioClip audioClipWin;
     [SerializeField] AudioClip audioClipGameOverAmbience;
+    [SerializeField] AudioClip audioClipUndo;
+    [SerializeField] AudioClip audioClipRedo;
 
     public bool IsLevelLoaded => CurrentLevel != null;
     public LevelBehavior CurrentLevel => Game.Instance.boardBehavior.CurrentLevel;
@@ -28,6 +30,7 @@ public class GameManager : MonoBehaviour {
     public bool IsNewElementSelected => Game.Instance.elementsSelectionBehavior.IsNewElementSelected;
     public bool IsNextMovementSelected => Game.Instance.movementsSelectionBehavior.IsNextMovementSelected;
     public bool IsResolvingMovement => Game.Instance.movementResolver.IsResolvingMovement;
+    public bool HasTriggerUndoRedo { get; private set; }
     public bool IsGameOver { get; private set; }
     public bool IsWin { get; private set; }
     public bool MustStartNextLevel => Game.Instance.panelWin.MustStartNextLevel;
@@ -46,7 +49,7 @@ public class GameManager : MonoBehaviour {
         Game.Instance.boardBehavior.Hide();
 
         Game.Instance.panelPileBehavior.Hide();
-        Game.Instance.panelLevelInfo.Hide();
+        Game.Instance.overlayHUD.Hide();
         Game.Instance.panelWin.Hide();
         Game.Instance.viewGameOverBehavior.Hide();
         Game.Instance.viewChapterBehavior.Hide();
@@ -55,24 +58,6 @@ public class GameManager : MonoBehaviour {
     void OnApplicationQuit() {
         //avoid calls from state graph when game exits, triggering errors logs
         gameObject.SetActive(false);
-    }
-
-    public void TriggerEnd(bool isGameOver) {
-
-        if (IsGameOver) {
-
-            IsGameOver = true;
-            IsWin = false;
-
-            Debug.Log("END: GAME OVER");
-
-        } else {
-
-            IsGameOver = false;
-            IsWin = true;
-
-            Debug.Log("END: WIN");
-        }
     }
 
     public void OnMainMenuStart() {
@@ -106,13 +91,23 @@ public class GameManager : MonoBehaviour {
 
         var loaded = Game.Instance.boardBehavior.LoadNewLevel(dataChapter, nextLevelNumberToLoad);
         if (!loaded) {
-            throw new NotSupportedException("Level " + nextLevelNumberToLoad + " found to play => end of chapter ?");
+
+            Debug.Log("Level " + nextLevelNumberToLoad + " not found => end of chapter");
+
+            //force quit
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+            return;
         }
 
         //prepare next level for after
         nextLevelNumberToLoad++;
 
         Game.Instance.panelLevelInfo.Show(dataChapter.ChapterName, CurrentLevelNumber);
+        Game.Instance.overlayHUD.ShowFade();
     }
 
     public void OnShowChapter() {
@@ -147,11 +142,11 @@ public class GameManager : MonoBehaviour {
         Game.Instance.inGameControlsBehavior.EnableControlsAfterDelay(0.1f);
 
         Game.Instance.mementoCaretaker.SaveCurrentState();
+
+        ComputeAndDisplayNextNPCMovementIndications();
     }
 
     public void OnSelectionStepBegin() {
-
-        //Debug.Log(">> STEP selection");
 
         Game.Instance.selectionStepManager.enabled = true;
 
@@ -182,8 +177,6 @@ public class GameManager : MonoBehaviour {
 
     public void OnMovementStepBegin() {
 
-        //Debug.Log(">> STEP movement");
-
         Game.Instance.movementStepManager.enabled = true;
 
         //replace default cursor marker by the one of the selected cursor
@@ -208,8 +201,6 @@ public class GameManager : MonoBehaviour {
 
     public void OnMovementResolveBegin() {
 
-        //Debug.Log(">> Resolve movement");
-
         Game.Instance.inGameControlsBehavior.DisableControls();
 
         Game.Instance.cursorBehavior.Hide();
@@ -224,6 +215,8 @@ public class GameManager : MonoBehaviour {
         Game.Instance.movementsSelectionBehavior.ClearNextMovement();
 
         Game.Instance.mementoCaretaker.SaveCurrentState();
+
+        ComputeAndDisplayNextNPCMovementIndications();
     }
 
     public void OnAnimateLevelHideBegin() {
@@ -231,6 +224,8 @@ public class GameManager : MonoBehaviour {
         Game.Instance.mementoCaretaker.Reset();
 
         Game.Instance.panelPileBehavior.Hide();
+        Game.Instance.overlayHUD.HideFade();
+
         Game.Instance.elementsSelectionBehavior.CancelSelection();
         Game.Instance.inGameControlsBehavior.DisableControls();
 
@@ -278,22 +273,25 @@ public class GameManager : MonoBehaviour {
 
         Game.Instance.boardBehavior.UnloadCurrentLevel();
 
-        Game.Instance.panelLevelInfo.Hide();
-
         //reset win camera of the previous level to move to the main dolly camera
         Game.Instance.vcamWin.Priority = 0;
+    }
+
+    public void TriggerEnd(bool isGameOver) {
+
+        IsGameOver = isGameOver;
+        IsWin = !isGameOver;
     }
 
     public void OnGameOverStart() {
 
         IsGameOver = true;
 
-        Game.Instance.viewGameOverBehavior.Show();
+        Game.Instance.viewGameOverBehavior.ShowFade();
+        Game.Instance.overlayHUD.HideFade();
 
         CurrentLevel.StopMusic();
         Game.Instance.audioManager.PlayAmbience(audioClipGameOverAmbience);
-
-        //TODO only enable "cancel previous movement" control
     }
 
     public void OnGameOverFinish() {
@@ -302,7 +300,46 @@ public class GameManager : MonoBehaviour {
 
         CurrentLevel.PlayMusic();
 
-        Game.Instance.viewGameOverBehavior.Hide();
+        Game.Instance.viewGameOverBehavior.HideFade();
+        Game.Instance.overlayHUD.ShowFade();
+
+        //prevent from redoing the same move that leads to gameover
+        Game.Instance.mementoCaretaker.ClearHistoryAfterCursor();
+    }
+
+    public void TryUndoRedoMovement(bool isUndo) {
+
+        if (isUndo) {
+
+            if (Game.Instance.mementoCaretaker.Undo()) {
+                Game.Instance.audioManager.PlaySimpleSound(audioClipUndo);
+                HasTriggerUndoRedo = true;
+            }
+
+        } else {
+
+            if (Game.Instance.mementoCaretaker.Redo()) {
+                Game.Instance.audioManager.PlaySimpleSound(audioClipRedo);
+                HasTriggerUndoRedo = true;
+            }
+        }
+    }
+
+    public void OnUndoRedoMovement() {
+
+        HasTriggerUndoRedo = false;
+
+        Game.Instance.elementsSelectionBehavior.CancelSelection(false);
+        Game.Instance.cursorBehavior.Hide();
+    }
+
+    void ComputeAndDisplayNextNPCMovementIndications() {
+
+        Game.Instance.aiTeamNeutral.ComputeNextNPCsMovements();
+        Game.Instance.aiTeamEnemy.ComputeNextNPCsMovements();
+
+        Game.Instance.aiTeamNeutral.DisplayNPCMovementIndications();
+        Game.Instance.aiTeamEnemy.DisplayNPCMovementIndications();
     }
 
 }

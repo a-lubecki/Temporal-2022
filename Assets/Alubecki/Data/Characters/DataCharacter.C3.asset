@@ -46,7 +46,7 @@ MonoBehaviour:
     value: 0
   - key: 20
     value: 3
-  - key: 80
+  - key: 150
     value: 0
   <AudioClipRotate>k__BackingField: {fileID: 8300000, guid: 293a4f66a92bd49cc97acf0ed4da3c4c, type: 3}
   <AudioClipMove>k__BackingField: {fileID: 8300000, guid: 4dcba79ebbbbb4504928666b6f0c206c, type: 3}

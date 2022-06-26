@@ -15,7 +15,13 @@ public class BoardBehavior : MonoBehaviour, IMementoOriginator {
 
 
     public void Show() {
+
         gameObject.SetActive(true);
+
+        //hide elements outside the board
+        foreach (var elem in GetElements()) {
+            elem.SetMeshesVisible(IsInsideBoardHorizontalLimits(elem.GridPos));
+        }
     }
 
     public void Hide() {
@@ -86,22 +92,20 @@ public class BoardBehavior : MonoBehaviour, IMementoOriginator {
     public IEnumerable<BaseElementBehavior> GetSortedPileOfElements(Vector2 horizontalPos) {
 
         return GetElements().Where(e => e.IsOnGridPile(horizontalPos))
-            .OrderBy(e => e.GridPosY);
-    }
-
-    public bool IsInsideBoardHorizontalLimits(Vector2 horizontalPos) {
-        return GetSortedPileOfElements(horizontalPos).Count() > 0;
+            .OrderBy(e => e.GridPosY + e.ColliderHeight);
     }
 
     public bool IsInsideBoardHorizontalLimits(Vector3 pos) {
-        return IsInsideBoardHorizontalLimits(new Vector2(pos.x, pos.z));
+        //if can't fall => is part of the board
+        return GetSortedPileOfElements(new Vector2(pos.x, pos.z))
+            .Any(e => e.IsPhysicallyWalkableOverBlock && pos.y >= e.GridPosY);
     }
 
-    public bool IsAnyWalkableElementUnderPos(Vector3 pos) {
-        return GetElemsUnderPos(pos).Any(e => e.IsPhysicallyWalkableOverBlock);
+    public bool IsAnyWalkableElementUnderPos(Vector3 pos, bool canWalkOverInvisibleBlocks = false) {
+        return GetElemsUnderPos(pos).Any(e => canWalkOverInvisibleBlocks ? e.IsTheoricallyWalkableOverBlock : e.IsPhysicallyWalkableOverBlock);
     }
 
-    public bool IsWalkablePos(Vector3 pos) {
+    public bool IsWalkablePos(Vector3 pos, bool canWalkOnInvisibleBlocks = false) {
 
         if (GetElemsOnPos(pos).Any(e => !e.IsPhysicallyWalkableInBlock)) {
             //must not have something on pos to walk on it
@@ -109,7 +113,7 @@ public class BoardBehavior : MonoBehaviour, IMementoOriginator {
         }
 
         //must have something under pos to walk on it
-        return IsAnyWalkableElementUnderPos(pos);
+        return IsAnyWalkableElementUnderPos(pos, canWalkOnInvisibleBlocks);
     }
 
     public bool HasElemOnPos(Vector3 pos) {
@@ -139,24 +143,18 @@ public class BoardBehavior : MonoBehaviour, IMementoOriginator {
         return pile.Where(e => e.GridPosY > y);
     }
 
-    public int GetFallHeight(BaseElementBehavior elem) {
+    public int GetFallHeight(BaseElementBehavior elem, bool canWalkOnInvisibleBlocks = false) {
 
         var height = 0;
         var y = elem.GridPosY;
 
-        while (y > POS_Y_GROUND && !IsAnyWalkableElementUnderPos(new Vector3(elem.GridPosX, y, elem.GridPosZ))) {
+        while (y > POS_Y_GROUND && !IsAnyWalkableElementUnderPos(new Vector3(elem.GridPosX, y, elem.GridPosZ), canWalkOnInvisibleBlocks)) {
 
             y--;
             height++;
         }
 
         return height;
-    }
-
-    public IEnumerable<BaseElementBehavior> GetAboutToFallElements() {
-
-        return GetElements()
-            .Where(e => e.CanFall && !IsAnyWalkableElementUnderPos(e.GridPos));
     }
 
 

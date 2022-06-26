@@ -10,7 +10,7 @@ public class MovementRelease : BaseMovement {
     public override bool NeedsMovementResolving => false;
 
 
-    public MovementRelease(MovementType movementType, BaseElementBehavior owner, Vector3 nextPos) : base(movementType, owner, nextPos) {
+    public MovementRelease(BaseMovement.Factory originalFactory, MovementType movementType, BaseElementBehavior owner, Vector3 nextPos) : base(originalFactory, movementType, owner, nextPos) {
     }
 
     public override IEnumerable<DisplayableMovementInfo> NewDisplayableMovementInfos() {
@@ -50,7 +50,7 @@ public class MovementRelease : BaseMovement {
         }
 
         public override BaseMovement NewMovement(BaseElementBehavior owner, Vector3 nextPos) {
-            return new MovementRelease(MovementType, owner, nextPos);
+            return new MovementRelease(this, MovementType, owner, nextPos);
         }
 
     }

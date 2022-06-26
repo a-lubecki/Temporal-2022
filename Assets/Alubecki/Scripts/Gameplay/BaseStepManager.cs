@@ -15,11 +15,15 @@ public abstract class BaseStepManager : MonoBehaviour {
 
         if (c.MustPauseGame) {
             PauseGame();
-        } else if (c.MustHideInterface) {
+        }
+
+        if (c.MustHideInterface) {
             HideInterface();
         } else if (c.MustShowInterface) {
             ShowInterface();
-        } else if (c.MustGoToPreviousNextMovement) {
+        }
+
+        if (c.MustGoToPreviousNextMovement) {
             GoToPreviousNextMovement(c.IsPreviousMovement);
         }
 
@@ -44,7 +48,8 @@ public abstract class BaseStepManager : MonoBehaviour {
     }
 
     void GoToPreviousNextMovement(bool isPreviousMovement) {
-        //TODO
+
+        Game.Instance.gameManager.TryUndoRedoMovement(isPreviousMovement);
     }
 
     protected void NavigatePointer(Vector2 pointerPosition) {

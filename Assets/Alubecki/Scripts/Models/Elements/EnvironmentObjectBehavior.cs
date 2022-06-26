@@ -11,7 +11,7 @@ public class EnvironmentObjectBehavior : BaseElementBehavior {
 
 
     public override DisplayableCharacteristics DisplayableCharacteristics => new DisplayableCharacteristics(
-        Color.grey,
+        new Color(0.8f, 0.8f, 0.8f),
         objectName,
         GetObjectDescription() + GetAgeText()
     );
@@ -24,7 +24,8 @@ public class EnvironmentObjectBehavior : BaseElementBehavior {
         return (ageBehavior == null) ? "" : ageBehavior.DisplayableText + "\n";
     }
 
-    void Awake() {
+    protected virtual void Awake() {
+        
         ageBehavior = GetComponent<AgeBehavior>();
     }
 

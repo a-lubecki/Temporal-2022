@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Lean.Pool;
@@ -20,7 +21,6 @@ public class PanelPileBehavior : MonoBehaviour {
         Hide();
 
         var elemsToShow = pile.Where(e => e.HasDisplayableCharacteristics);
-
         if (elemsToShow.Count() <= 0) {
             //no elems to display
             return;
@@ -38,13 +38,19 @@ public class PanelPileBehavior : MonoBehaviour {
         }
 
         //force update panel to avoid resizing bugs
-        LayoutRebuilder.MarkLayoutForRebuild(transform as RectTransform);
+        StartCoroutine(ForceRebuildAfterDelay());
+    }
+
+    IEnumerator ForceRebuildAfterDelay() {
+
+        yield return new WaitForSeconds(0.05f);
+
+        LayoutRebuilder.MarkLayoutForRebuild(trContent as RectTransform);
     }
 
     public void Hide() {
 
         foreach (var panel in GetComponentsInChildren<PanelElementBehavior>()) {
-
             LeanPool.Despawn(panel);
         }
 

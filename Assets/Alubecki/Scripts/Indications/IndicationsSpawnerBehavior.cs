@@ -8,15 +8,20 @@ public class IndicationsSpawnerBehavior : MonoBehaviour {
 
     [SerializeField] Transform trIndicationsCharacterMove;
     [SerializeField] Transform trIndicationsMovableObjectMove;
-    [SerializeField] Transform trIndicationsNPCAction;
+    [SerializeField] Transform trIndicationsNPCMovement;
 
     public void SpawnMovementIndication(DisplayableMovementInfo info) {
 
         LeanGameObjectPool pool;
         Transform trParent;
 
-        //, info.pos, Quaternion.Euler(0, info.Orientation, 0)
-        if (info.Display == MovementDisplay.SQUARE) {
+        var owner = info.Movement?.Owner as CharacterBehavior;
+        if (owner != null && owner.IsNPC) {
+
+            pool = Game.Instance.poolIndicationNPCMovement;
+            trParent = trIndicationsNPCMovement;
+
+        } else if (info.Display == MovementDisplay.SQUARE) {
 
             pool = Game.Instance.poolIndicationCharacterMove;
             trParent = trIndicationsCharacterMove;
@@ -38,6 +43,22 @@ public class IndicationsSpawnerBehavior : MonoBehaviour {
 
         Game.Instance.poolIndicationCharacterMove.DespawnAll();
         Game.Instance.poolIndicationMovableObjectMove.DespawnAll();
+    }
+
+    public void DespawnNPCMovementIndication(CharacterBehavior characterBehavior) {
+
+        if (characterBehavior == null) {
+            throw new ArgumentException();
+        }
+
+        foreach (Transform t in trIndicationsNPCMovement) {
+
+            var indication = t.GetComponent<IndicationMoveBehavior>();
+            if (indication.Movement?.Owner == characterBehavior) {
+                Game.Instance.poolIndicationNPCMovement.Despawn(indication.gameObject);
+                return;
+            }
+        }
     }
 
 }

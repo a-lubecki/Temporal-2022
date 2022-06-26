@@ -28,7 +28,7 @@ public class CharacterPawnBehavior : MonoBehaviour {
         tr.localRotation = transform.localRotation;
 
         var character = go.GetComponent<CharacterBehavior>();
-        character.InitWithCharacterData(dataCharacterInChapter);
+        character.InitWithCharacterData(dataCharacterInChapter, GetComponentInChildren<BaseAIDecider>());
 
         return character;
     }

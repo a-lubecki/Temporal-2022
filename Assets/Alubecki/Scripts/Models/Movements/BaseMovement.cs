@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 
 public abstract class BaseMovement {
 
+
+    Factory originalFactory;
 
     //use weak reference in case the object needs to be garbase collected
     WeakReference<BaseElementBehavior> ownerRef;
@@ -24,8 +27,9 @@ public abstract class BaseMovement {
     public abstract bool NeedsMovementResolving { get; }
 
 
-    public BaseMovement(MovementType movementType, BaseElementBehavior owner, Vector3 nextPos) {
+    public BaseMovement(BaseMovement.Factory originalFactory, MovementType movementType, BaseElementBehavior owner, Vector3 nextPos) {
 
+        this.originalFactory = originalFactory;
         MovementType = movementType;
         ownerRef = new WeakReference<BaseElementBehavior>(owner);
         NextPos = nextPos;
@@ -33,10 +37,27 @@ public abstract class BaseMovement {
 
     public abstract IEnumerable<DisplayableMovementInfo> NewDisplayableMovementInfos();
 
+    public bool CanExecute() {
+
+        var owner = Owner;
+        if (owner == null) {
+            return false;
+        }
+
+        var possibleMovements = originalFactory.GetNextPossibleMovementTargets(owner);
+        if (!possibleMovements.Contains(NextPos)) {
+            //something changed, the target pos is not available any more
+            return false;
+        }
+
+        return true;
+    }
+
     public void Execute(Action onComplete) {
 
-        if (ownerRef.TryGetTarget(out var elem) && elem.isActiveAndEnabled) {
-            ExecuteInternal(elem, onComplete);
+        var owner = Owner;
+        if (owner != null) {
+            ExecuteInternal(owner, onComplete);
         } else {
             onComplete?.Invoke();
         }

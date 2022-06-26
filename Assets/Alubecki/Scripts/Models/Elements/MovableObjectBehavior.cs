@@ -24,7 +24,7 @@ public class MovableObjectBehavior : BaseElementBehavior {
 
 
     public override DisplayableCharacteristics DisplayableCharacteristics => new DisplayableCharacteristics(
-        Color.yellow,
+        new Color(1, 1, 0.3f),
         objectName,
         "Can be pushed or pulled by characters.\n\n" + GetAgeText() + weightBehavior.DisplayableText + GetTemporalAbilityText()
     );
@@ -38,7 +38,8 @@ public class MovableObjectBehavior : BaseElementBehavior {
     }
 
 
-    void Awake() {
+    protected virtual void Awake() {
+
         ageBehavior = GetComponent<AgeBehavior>();
         weightBehavior = GetComponent<WeightBehavior>();
         temporalAbilityBehavior = GetComponent<TemporalAbilityBehavior>();
@@ -79,6 +80,7 @@ public class MovableObjectBehavior : BaseElementBehavior {
         //auto release
         GrabbedCharacter?.ReleaseMovableObject(true);
 
+        //playsound delayed to fit the fall
         DOTween.Sequence()
             .AppendInterval(0.4f * durationSec)
             .AppendCallback(() => {

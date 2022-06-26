@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 
@@ -9,18 +10,42 @@ public abstract class BaseElementBehavior : GridPosBehavior, IMementoOriginator 
 
     [SerializeField] bool preventFromWalkingOn;
 
+    /// <summary>
+    /// When a ground is invisible, only NPC can go on it to enter / leave the board
+    /// </summary>
+    public bool IsInvisible => HasInvisibleMeshes || !gameObject.activeInHierarchy;
+    public bool HasInvisibleMeshes => GetComponentsInChildren<MeshRenderer>().Where(mr => mr.enabled).Count() <= 0;
     public virtual bool IsCursorAboveElement => true;
     public virtual bool CanBeSelected => false;
     public int ColliderHeight => GetComponentInChildren<OverridenHeightBehavior>()?.ColliderHeight ?? 1;
-    public virtual bool IsPhysicallyWalkableInBlock => !preventFromWalkingOn && ColliderHeight <= 0;
-    public virtual bool IsPhysicallyWalkableOverBlock => !preventFromWalkingOn && ColliderHeight > 0;
+    public virtual bool IsPhysicallyWalkableInBlock => !IsInvisible && !preventFromWalkingOn && ColliderHeight <= 0;
+    public virtual bool IsPhysicallyWalkableOverBlock => !IsInvisible && !preventFromWalkingOn && ColliderHeight > 0;
+    public virtual bool IsTheoricallyWalkableOverBlock => !preventFromWalkingOn && ColliderHeight > 0;
     public virtual bool CanMove => false;
+    public virtual bool CanMoveOverInvisibleBlocks => false;
     public virtual bool CanFall => false;
     protected virtual BaseMovement.Factory[] PossibleMovements => null;
 
     public bool HasDisplayableCharacteristics => DisplayableCharacteristics != null;
     public abstract DisplayableCharacteristics DisplayableCharacteristics { get; }
 
+
+    public void SetMeshesVisible(bool isVisible) {
+
+        if (TryGetComponent<AgeBehavior>(out var ageBehavior)) {
+
+            //let the age behavior udpdate meshes
+            ageBehavior.SetMeshesEnabled(isVisible);
+
+        } else {
+
+            //update manually
+            var meshRenderers = transform.GetComponentsInChildren<MeshRenderer>();
+            foreach (var mr in meshRenderers) {
+                mr.enabled = isVisible;
+            }
+        }
+    }
 
     public int GetColliderHeightForAge(int age) {
         return GetComponent<AgeBehavior>()?.FindMeshForAge(age)?.GetComponent<OverridenHeightBehavior>()?.ColliderHeight ?? 1;
@@ -49,6 +74,7 @@ public abstract class BaseElementBehavior : GridPosBehavior, IMementoOriginator 
             GetInstanceID(),
             transform.localPosition,
             transform.localRotation,
+            (this as CharacterBehavior)?.IsDead ?? false,
             ageBehavior?.CurrentAge ?? 0,
             ageParadoxBehavior?.IsInParadoxState ?? false,
             ageParadoxBehavior?.ParadoxAge ?? 0
@@ -65,6 +91,15 @@ public abstract class BaseElementBehavior : GridPosBehavior, IMementoOriginator 
 
         transform.localPosition = s.localPos;
         transform.localRotation = s.localRot;
+
+        var c = this as CharacterBehavior;
+        if (c != null) {
+            if (s.isDead) {
+                c.SetAsDead();
+            } else {
+                c.SetAsAlive();
+            }
+        }
 
         GetComponent<AgeBehavior>()?.InitCurrentAge(s.age);
     }
@@ -134,7 +169,7 @@ public abstract class BaseElementBehavior : GridPosBehavior, IMementoOriginator 
 
     IEnumerator CompleteAnimateChangesAfterDelay(float durationSec, Action onComplete) {
 
-        yield return new WaitForSeconds(durationSec + 0.01f);
+        yield return new WaitForSeconds(durationSec + ANIM_WAIT_BEFORE_CALLBACK_SEC);
 
         onComplete?.Invoke();
     }

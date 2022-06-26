@@ -6,18 +6,21 @@ using UnityEngine;
 public class MovementClimb : MovementSimpleMove {
 
 
+    public const float DURATION_ANIM_CLIMB_SEC = 0.25f;
+
+
     public bool IsClimbingUp { get; private set; }
 
     public override string DisplayableName => IsClimbingUp ? "Climb up" : "Climb down";
 
 
-    public MovementClimb(MovementType movementType, BaseElementBehavior owner, Vector3 nextPos) : base(movementType, owner, nextPos) {
+    public MovementClimb(BaseMovement.Factory originalFactory, MovementType movementType, BaseElementBehavior owner, Vector3 nextPos) : base(originalFactory, movementType, owner, nextPos) {
         this.IsClimbingUp = owner.GridPosY < nextPos.y;
     }
 
     protected override void ExecuteInternal(BaseElementBehavior owner, Action onComplete) {
-
-        (owner as CharacterBehavior)?.TryClimb(NextPos, 0.25f, onComplete, true, 0.1f);
+        //replace movement: no base method call
+        (owner as CharacterBehavior)?.TryClimb(NextPos, DURATION_ANIM_CLIMB_SEC, onComplete, true, DURATION_ANIM_AUTOROTATE_SEC);
     }
 
 
@@ -60,7 +63,7 @@ public class MovementClimb : MovementSimpleMove {
         }
 
         public override BaseMovement NewMovement(BaseElementBehavior owner, Vector3 nextPos) {
-            return new MovementClimb(MovementType, owner, nextPos);
+            return new MovementClimb(this, MovementType, owner, nextPos);
         }
 
     }

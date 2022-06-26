@@ -1,16 +1,21 @@
-using System;
 using UnityEngine;
 
 
-public class ViewGameOverBehavior : MonoBehaviour {
+public class ViewGameOverBehavior : BaseViewOverlay {
 
 
-    public void Show() {
-        gameObject.SetActive(true);
-    }
+    void Update() {
 
-    public void Hide() {
-        gameObject.SetActive(false);
+        if (!IsFullyVisible) {
+            //can trigger undi if view is fully visible
+            return;
+        }
+
+        var c = Game.Instance.inGameControlsBehavior;
+
+        if (c.MustGoToPreviousNextMovement && c.IsPreviousMovement) {
+            Game.Instance.gameManager.TryUndoRedoMovement(true);
+        }
     }
 
 }

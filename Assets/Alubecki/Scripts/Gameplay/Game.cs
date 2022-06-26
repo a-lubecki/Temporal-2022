@@ -17,12 +17,15 @@ public class Game : MonoBehaviourSingleton<Game> {
     public MovementResolver movementResolver;
     public MementoCaretaker mementoCaretaker;
 
+    public AITeamBehavior aiTeamNeutral;
+    public AITeamBehavior aiTeamEnemy;
+
     public CameraController mainCameraController;
     public CinemachineVirtualCamera vcamWin;
 
     public LeanGameObjectPool poolIndicationCharacterMove;
     public LeanGameObjectPool poolIndicationMovableObjectMove;
-    public LeanGameObjectPool poolIndicationNPCAction;
+    public LeanGameObjectPool poolIndicationNPCMovement;
     public LeanGameObjectPool poolPanelElement;
     public LeanGameObjectPool poolActionButtonGroup;
     public LeanGameObjectPool poolTemporalZone;
@@ -35,6 +38,7 @@ public class Game : MonoBehaviourSingleton<Game> {
     public BoardBehavior boardBehavior;
 
     public Canvas canvas;
+    public BaseViewOverlay overlayHUD;
     public PanelLevelInfo panelLevelInfo;
     public PanelPileBehavior panelPileBehavior;
     public PanelWin panelWin;
@@ -42,6 +46,5 @@ public class Game : MonoBehaviourSingleton<Game> {
     public ViewChapterBehavior viewChapterBehavior;
 
     public AudioManager audioManager;
-
 
 }

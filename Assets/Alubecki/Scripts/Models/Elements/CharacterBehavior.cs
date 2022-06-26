@@ -11,6 +11,7 @@ public class CharacterBehavior : BaseElementBehavior {
     WeightBehavior weightBehavior;
     StrongnessBehavior strongnessBehavior;
     TemporalAbilityBehavior temporalAbilityBehavior;
+    AINPCBehavior aiNPCBehavior;
 
     [SerializeField] DataCharacterInChapter dataCharacterInChapter;
 
@@ -38,6 +39,7 @@ public class CharacterBehavior : BaseElementBehavior {
     public override bool CanBeSelected => Team == Team.ALLY;
     public override bool IsPhysicallyWalkableOverBlock => false;
     public override bool CanMove => IsAlive && !IsGrabbing;
+    public override bool CanMoveOverInvisibleBlocks => IsNPC;//spcial case for NPCs, they can walk on invisible blocks
     public override bool CanFall => true;
     public bool CanDoAction => IsAlive && !IsGrabbing;
     public bool CanClimb => CanDoAction && (agility == Agility.AGILE || agility == Agility.VERY_AGILE);
@@ -74,7 +76,7 @@ public class CharacterBehavior : BaseElementBehavior {
 
     Color GetDisplayableColor() => Team switch {
         Team.ALLY => new Color(0.3f, 0.8f, 0.3f),
-        Team.ENEMY => new Color(0.8f, 0.3f, 0.3f),
+        Team.ENEMY => new Color(0.8f, 0.5f, 0.5f),
         Team.NEUTRAL => new Color(0.8f, 0.6f, 0.3f),
         _ => throw new NotImplementedException()
     };
@@ -139,14 +141,14 @@ public class CharacterBehavior : BaseElementBehavior {
         _ => throw new NotImplementedException()
     };
 
-    void Awake() {
+    protected virtual void Awake() {
 
         if (dataCharacterInChapter != null) {
-            InitWithCharacterData(dataCharacterInChapter);
+            InitWithCharacterData(dataCharacterInChapter, null);
         }
     }
 
-    void Update() {
+    protected virtual void Update() {
 
         if (ageBehavior.DidAgeChange) {
             UpdateCharacteristicsWithCurrentAge();
@@ -158,7 +160,7 @@ public class CharacterBehavior : BaseElementBehavior {
         ReleaseMovableObject(true);
     }
 
-    public void InitWithCharacterData(DataCharacterInChapter dataCharacterInChapter) {
+    public void InitWithCharacterData(DataCharacterInChapter dataCharacterInChapter, BaseAIDecider npcDecider) {
 
         this.dataCharacterInChapter = dataCharacterInChapter ?? throw new ArgumentException("Character needs data to be initialized correctly");
 
@@ -179,6 +181,13 @@ public class CharacterBehavior : BaseElementBehavior {
         }
 
         UpdateCharacteristicsWithCurrentAge();
+
+        if (IsNPC) {
+            aiNPCBehavior = GetComponent<AINPCBehavior>() ?? gameObject.AddComponent<AINPCBehavior>();
+            aiNPCBehavior.InitAIDecider(npcDecider);
+        } else if (npcDecider != null) {
+            throw new InvalidOperationException("You are trying to set a BaseAIDecider on a player character");
+        }
     }
 
     void UpdateCharacteristicsWithCurrentAge() {
@@ -291,6 +300,7 @@ public class CharacterBehavior : BaseElementBehavior {
             return false;
         }
 
+        //playsound delayed to fit the jump
         Game.Instance.audioManager.PlaySimpleSound(AudioClipClimb);
 
         return true;
@@ -302,6 +312,7 @@ public class CharacterBehavior : BaseElementBehavior {
             return false;
         }
 
+        //playsound delayed to fit the jump
         DOTween.Sequence()
             .AppendInterval(durationSec)
             .AppendCallback(() => {
@@ -320,6 +331,7 @@ public class CharacterBehavior : BaseElementBehavior {
         //auto release
         ReleaseMovableObject(true);
 
+        //playsound delayed to fit the fall
         DOTween.Sequence()
             .AppendInterval(0.4f * durationSec)
             .AppendCallback(() => {
@@ -354,13 +366,9 @@ public class CharacterBehavior : BaseElementBehavior {
 
         var s = transform.DOLocalJump(transform.position, 0.1f, 3, durationSec);
 
-        //callback if necessary
-        if (onComplete != null) {
-            s.AppendInterval(0.01f)
-                .OnComplete(() => onComplete());
-        }
-
         Game.Instance.audioManager.PlaySimpleSound(AudioClipMove);
+
+        CallOnComplete(s, onComplete);
     }
 
 }

@@ -33,7 +33,7 @@ public class MementoCaretaker : MonoBehaviour {
         cursor = -1;
     }
 
-    void ClearHistoryAfterCursor() {
+    public void ClearHistoryAfterCursor() {
 
         if (history.Count > 0 && cursor < history.Count - 1) {
             history.RemoveRange(cursor + 1, history.Count - 1 - cursor);
@@ -47,8 +47,6 @@ public class MementoCaretaker : MonoBehaviour {
 
         history.Add(originator.NewSnapshot());
         cursor++;
-
-        Debug.Log("save : " + (cursor+1) + "/" + history.Count);
     }
 
     public bool RestoreExistingState(IMementoSnapshot snapshot) {
@@ -74,12 +72,12 @@ public class MementoCaretaker : MonoBehaviour {
             return false;
         }
 
-        cursor--;
-
         if (cursor <= 0) {
             cursor = 0;
             return false;
         }
+
+        cursor--;
 
         originator.Restore(history[cursor]);
 
@@ -92,12 +90,12 @@ public class MementoCaretaker : MonoBehaviour {
             return false;
         }
 
-        cursor++;
-
-        if (cursor >= history.Count) {
+        if (cursor >= history.Count - 1) {
             cursor = history.Count - 1;
             return false;
         }
+
+        cursor++;
 
         originator.Restore(history[cursor]);
 
