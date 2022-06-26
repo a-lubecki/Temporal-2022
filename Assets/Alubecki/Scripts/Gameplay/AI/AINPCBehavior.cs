@@ -14,6 +14,7 @@ public class AINPCBehavior : MonoBehaviour {
     [SerializeField] BaseAIDecider decider;
 
     List<BaseMovement> preparedMovements = new List<BaseMovement>();
+    Vector3 attackedPos;
     bool didAttack;
 
 
@@ -82,11 +83,29 @@ public class AINPCBehavior : MonoBehaviour {
         }
 
         if (!characterBehavior.IsEnemy) {
-            //temporary test for demo
+            //temporary test for demo: only enemy can attack
             return false;
         }
 
-        return GetCharactersOnAttackPos().Count() > 0;
+        //attack on the pos, over the pos and under the pos
+        var pos = GetAttackPos();
+
+        attackedPos = pos;
+        if (GetCharactersOnAttackPos(attackedPos).Count() > 0) {
+            return true;
+        }
+
+        attackedPos = pos + Vector3.up;
+        if (GetCharactersOnAttackPos(attackedPos).Count() > 0) {
+            return true;
+        }
+
+        attackedPos = pos + Vector3.down;
+        if (GetCharactersOnAttackPos(attackedPos).Count() > 0) {
+            return true;
+        }
+
+        return false;
     }
 
     Vector3 GetAttackPos() => characterBehavior.Orientation switch {
@@ -98,9 +117,9 @@ public class AINPCBehavior : MonoBehaviour {
         _ => throw new NotImplementedException()
     };
 
-    IEnumerable<CharacterBehavior> GetCharactersOnAttackPos() {
+    IEnumerable<CharacterBehavior> GetCharactersOnAttackPos(Vector3 pos) {
 
-        return Game.Instance.boardBehavior.GetElemsOnPos(GetAttackPos())
+        return Game.Instance.boardBehavior.GetElemsOnPos(pos)
             .OfType<CharacterBehavior>()
             .Where(c => !c.IsInvisible && IsAttackMatrixSatisfied(characterBehavior.Team, c.Team));
     }
@@ -117,10 +136,11 @@ public class AINPCBehavior : MonoBehaviour {
 
         didAttack = true;
 
+        var pos = GetAttackPos();
         var isAnimating = true;
 
         characterBehavior.Attack(
-            GetAttackPos(),
+            pos,
             MovementSimpleMove.DURATION_ANIM_AUTOROTATE_SEC,
             () => isAnimating = false
         );
@@ -128,8 +148,7 @@ public class AINPCBehavior : MonoBehaviour {
         yield return new WaitWhile(() => isAnimating);
 
         //resolve attacked characters
-        var attackedCharacters = GetCharactersOnAttackPos();
-        foreach (var c in attackedCharacters) {
+        foreach (var c in GetCharactersOnAttackPos(attackedPos)) {
             c.SetAsDead();
         }
     }

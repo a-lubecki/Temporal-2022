@@ -62,6 +62,7 @@ public class CharacterBehavior : BaseElementBehavior {
     public bool IsDefinitelyDead => lifeStatus == LifeStatus.DEFINITELY_DEAD;
 
     protected override BaseMovement.Factory[] PossibleMovements => new BaseMovement.Factory[] {
+        new MovementSimpleLookAt.Factory(),
         new MovementSimpleMove.Factory(),
         new MovementClimb.Factory(),
         new MovementJumpHigh.Factory(),

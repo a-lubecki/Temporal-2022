@@ -42,10 +42,16 @@ public class MementoCaretaker : MonoBehaviour {
 
     public void SaveCurrentState() {
 
+        var newSnapshot = originator.NewSnapshot();
+        if (newSnapshot.Equals(GetCurrentSnapshot())) {
+            //no need to save the same snapshot as the previous turn
+            return;
+        }
+
         //clear history after cursor (if player did undo, snapshots after cursor are cast)
         ClearHistoryAfterCursor();
 
-        history.Add(originator.NewSnapshot());
+        history.Add(newSnapshot);
         cursor++;
     }
 

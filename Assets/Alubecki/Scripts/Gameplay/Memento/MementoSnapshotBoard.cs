@@ -4,11 +4,11 @@ using System.Collections.Generic;
 
 public struct MementoSnapshotBoard : IMementoSnapshot {
 
-    readonly List<MementoSnapshotElement> elementSnapshots;
+    readonly HashSet<MementoSnapshotElement> elementSnapshots;
 
     public MementoSnapshotBoard(IEnumerable<MementoSnapshotElement> elementSnapshots) {
         //defensive copy
-        this.elementSnapshots = new List<MementoSnapshotElement>(elementSnapshots);
+        this.elementSnapshots = new HashSet<MementoSnapshotElement>(elementSnapshots);
     }
 
     public IEnumerable<MementoSnapshotElement> GetElementsSnapshot() {
@@ -41,6 +41,19 @@ public struct MementoSnapshotBoard : IMementoSnapshot {
                 }
             }
         }
+    }
+
+    public override bool Equals(object obj) {
+
+        if (obj == null || !(obj is MementoSnapshotBoard)) {
+            return false;
+        }
+
+        return elementSnapshots.SetEquals(((MementoSnapshotBoard)obj).elementSnapshots);
+    }
+
+    public override int GetHashCode() {
+        throw new NotImplementedException("Not implemented yet because not used as key in dictionary");
     }
 
 }

@@ -94,6 +94,8 @@ public class CameraController : MonoBehaviour {
 
     public void ResetRotationAndZoom() {
 
+        PrepareCamToMove();
+
         horizontalPosition = HorizontalPosition.SW;
         zoomLevel = ZoomLevel.DEFAULT;
     }
@@ -166,16 +168,16 @@ public class CameraController : MonoBehaviour {
 
     public float GetDollyTrackYPosition() => zoomLevel switch {
 
-        ZoomLevel.CLOSE => 25,
-        ZoomLevel.DEFAULT => 50,
-        ZoomLevel.FAR => 80,
+        ZoomLevel.CLOSE => 35,
+        ZoomLevel.DEFAULT => 60,
+        ZoomLevel.FAR => 90,
         _ => throw new NotImplementedException()
     };
 
     public float GetDollyTrackSize() => zoomLevel switch {
 
         ZoomLevel.CLOSE => 0.6f,
-        ZoomLevel.DEFAULT => 0.8f,
+        ZoomLevel.DEFAULT => 0.7f,
         ZoomLevel.FAR => 0.5f,
         _ => throw new NotImplementedException()
     };

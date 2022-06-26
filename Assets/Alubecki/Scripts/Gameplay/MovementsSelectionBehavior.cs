@@ -67,6 +67,10 @@ public class MovementsSelectionBehavior : MonoBehaviour {
         foreach (var m in movements) {
 
             var infos = m.NewDisplayableMovementInfos();
+            if (infos == null) {
+                //can't show infos
+                continue;
+            }
 
             foreach (var info in infos) {
 

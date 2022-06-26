@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 
@@ -24,6 +25,28 @@ public struct MementoSnapshotElement : IMementoSnapshot {
         this.age = age;
         this.isInParadoxState = isInParadoxState;
         this.ageInParadox = ageInParadox;
+    }
+
+    public override bool Equals(object obj) {
+
+        if (obj == null || !(obj is MementoSnapshotElement)) {
+            return false;
+        }
+
+        var o = (MementoSnapshotElement)obj;
+
+        return instanceId == o.instanceId &&
+            hasInvisibleMeshes == o.hasInvisibleMeshes &&
+            localPos == o.localPos &&
+            localRot == o.localRot &&
+            isDead == o.isDead &&
+            age == o.age &&
+            isInParadoxState == o.isInParadoxState &&
+            ageInParadox == o.ageInParadox;
+    }
+
+    public override int GetHashCode() {
+        return instanceId.GetHashCode();
     }
 
 }

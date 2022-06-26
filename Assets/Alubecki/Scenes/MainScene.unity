@@ -2516,8 +2516,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63534745b11aa4702828a34c7e2b1f31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dataChapter: {fileID: 11400000, guid: 2f07a0de9fd4b4ddc8b51efbaf67f4ab, type: 2}
-  nextLevelNumberToLoad: 2
+  dataChapter: {fileID: 11400000, guid: 17969691958074c26a285334aa79843f, type: 2}
+  nextLevelNumberToLoad: 3
   audioClipWin: {fileID: 8300000, guid: 2ebdca8ec63a3437996cf8b77861be12, type: 3}
   audioClipGameOverAmbience: {fileID: 8300000, guid: 8bebf1029361747c58d1fa6551885b20, type: 3}
   audioClipUndo: {fileID: 8300000, guid: c617fecd97cd64c8b84d01837a41e619, type: 3}

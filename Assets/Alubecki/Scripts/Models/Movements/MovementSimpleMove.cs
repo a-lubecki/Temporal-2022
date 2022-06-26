@@ -39,7 +39,7 @@ public class MovementSimpleMove : BaseMovement {
             owner.SetMeshesVisible(true);
         }
 
-        bool ok = owner.TryMove(
+        owner.TryMove(
             NextPos,
             DURATION_ANIM_MOVE_SEC,
             () => {

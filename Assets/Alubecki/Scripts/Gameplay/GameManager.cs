@@ -88,6 +88,7 @@ public class GameManager : MonoBehaviour {
 
         //hide the board to avoid seeing the loaded level before its animation
         Game.Instance.boardBehavior.Hide();
+        Game.Instance.mainCameraController.SetLookAtTarget(null);
 
         var loaded = Game.Instance.boardBehavior.LoadNewLevel(dataChapter, nextLevelNumberToLoad);
         if (!loaded) {
@@ -156,6 +157,8 @@ public class GameManager : MonoBehaviour {
             var characters = Game.Instance.boardBehavior.GetElements().Where(e => e.TryGetComponent<CharacterBehavior>(out var character) && character.IsPlayable);
             if (characters.Count() == 1) {
                 Game.Instance.elementsSelectionBehavior.ValidateSelection(characters.First(), false);
+            } else {
+                Game.Instance.mainCameraController.SetLookAtTarget(null);
             }
 
         } else if (Game.Instance.elementsSelectionBehavior.IsNewElementSelected) {
@@ -238,7 +241,7 @@ public class GameManager : MonoBehaviour {
 
     IEnumerator AnimateLevelHideAfterDelay() {
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.1f);
 
         Game.Instance.mainCameraController.ResetRotationAndZoom();
 

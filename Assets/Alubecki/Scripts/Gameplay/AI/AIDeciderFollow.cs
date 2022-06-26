@@ -22,7 +22,7 @@ public class AIDeciderFollow : BaseAIDecider {
             return null;
         }
 
-        //only get possible moves on x and z axis
+        //move on x and z axis, if the character can climb on jump, it will be automatically resolved
         var possibleMovements = character.GetPossibleMovements()
             .Where(m => m is MovementSimpleMove.Factory || m is MovementClimb.Factory || m is MovementJumpHigh.Factory);
 
@@ -51,7 +51,22 @@ public class AIDeciderFollow : BaseAIDecider {
             }
         }
 
+        //if near and couldn't walk, look at
+        if (bestMovement == null && IsHorizontallyAdjacent(characterPos, targetPos)) {
+
+            var possibleMovementLookAt = character.GetPossibleMovements()
+                .FirstOrDefault(m => m is MovementSimpleLookAt.Factory);
+
+            var destinationPos = new Vector3(targetPos.x, character.GridPosY, targetPos.y);
+            return possibleMovementLookAt?.NewMovement(character, destinationPos);
+        }
+
         return bestMovement;
+    }
+
+    bool IsHorizontallyAdjacent(Vector2 origin, Vector2 target) {
+        return origin.x == target.x && Mathf.Abs(origin.y - target.y) == 1
+            || origin.y == target.y && Mathf.Abs(origin.x - target.x) == 1;
     }
 
     /// <summary>
