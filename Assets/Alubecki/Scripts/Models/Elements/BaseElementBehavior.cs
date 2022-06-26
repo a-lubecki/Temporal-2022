@@ -72,6 +72,7 @@ public abstract class BaseElementBehavior : GridPosBehavior, IMementoOriginator 
 
         return new MementoSnapshotElement(
             GetInstanceID(),
+            HasInvisibleMeshes,
             transform.localPosition,
             transform.localRotation,
             (this as CharacterBehavior)?.IsDead ?? false,
@@ -88,6 +89,8 @@ public abstract class BaseElementBehavior : GridPosBehavior, IMementoOriginator 
         }
 
         var s = (MementoSnapshotElement)snapshot;
+
+        SetMeshesVisible(!s.hasInvisibleMeshes);
 
         transform.localPosition = s.localPos;
         transform.localRotation = s.localRot;

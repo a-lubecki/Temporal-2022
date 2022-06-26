@@ -29,7 +29,30 @@ public class AINPCBehavior : MonoBehaviour {
         return 1;//TODO get priority to decide what NPC in a team must move first if number of movements are limited during a turn
     }
 
+    public void ResetNextMovements() {
+
+        preparedMovements.Clear();
+    }
+
+    public void PrepareNextBestMovement() {
+
+        if (decider == null) {
+            return;
+        }
+
+        //let the decider decide a movement even if it's sleeping >=> sleeping state check is in ExtractNextPreparedMovement(), after the player movement is resolved
+        var nextMovement = decider.NewMovement(characterBehavior);
+        if (nextMovement != null) {
+            preparedMovements.Add(nextMovement);
+        }
+    }
+
     public BaseMovement ExtractNextPreparedMovement() {
+
+        //check if the decider if sleeping now as the board could change between PrepareNextBestMovement and now
+        if (decider == null || decider.IsSleeping) {
+            return null;
+        }
 
         var movement = preparedMovements.FirstOrDefault();
         if (movement == null) {
@@ -41,19 +64,6 @@ public class AINPCBehavior : MonoBehaviour {
         return movement;
     }
 
-    public void ResetNextMovements() {
-
-        preparedMovements.Clear();
-    }
-
-    public void PrepareNextBestMovement() {
-
-        var nextMovement = decider?.NewMovement(characterBehavior);
-        if (nextMovement != null) {
-            preparedMovements.Add(nextMovement);
-        }
-    }
-
     public void ResetAttackFlag() {
 
         didAttack = false;
@@ -63,6 +73,11 @@ public class AINPCBehavior : MonoBehaviour {
 
         if (didAttack) {
             //can't do several attacks
+            return false;
+        }
+
+        if (characterBehavior.IsInvisible) {
+            //can't attack if not on the board
             return false;
         }
 
@@ -87,7 +102,7 @@ public class AINPCBehavior : MonoBehaviour {
 
         return Game.Instance.boardBehavior.GetElemsOnPos(GetAttackPos())
             .OfType<CharacterBehavior>()
-            .Where(c => IsAttackMatrixSatisfied(characterBehavior.Team, c.Team));
+            .Where(c => !c.IsInvisible && IsAttackMatrixSatisfied(characterBehavior.Team, c.Team));
     }
 
     bool IsAttackMatrixSatisfied(Team attacker, Team attacked) {
@@ -102,14 +117,21 @@ public class AINPCBehavior : MonoBehaviour {
 
         didAttack = true;
 
-        //TODO animate attack on pos, ex : characterBehavior.Attack(GetAttackPos())
+        var isAnimating = true;
 
+        characterBehavior.Attack(
+            GetAttackPos(),
+            MovementSimpleMove.DURATION_ANIM_AUTOROTATE_SEC,
+            () => isAnimating = false
+        );
+
+        yield return new WaitWhile(() => isAnimating);
+
+        //resolve attacked characters
         var attackedCharacters = GetCharactersOnAttackPos();
         foreach (var c in attackedCharacters) {
             c.SetAsDead();
         }
-
-        yield break;
     }
 
 }

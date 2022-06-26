@@ -21,6 +21,7 @@ public class CameraController : MonoBehaviour {
     [SerializeField] HorizontalPosition horizontalPosition = HorizontalPosition.SW;
     [SerializeField] ZoomLevel zoomLevel = ZoomLevel.DEFAULT;
 
+    Transform trLookAtTarget;
     HorizontalPosition lastHorizontalPosition = (HorizontalPosition)(-1);//optim for LateUpdate
     ZoomLevel lastZoomLevel = (ZoomLevel)(-1);//optim for LateUpdate
     float initialHorizontalDamping;
@@ -76,8 +77,7 @@ public class CameraController : MonoBehaviour {
         }
 
         //change "look at" position to change orientation to selected object
-        var selectedElem = Game.Instance.elementsSelectionBehavior.SelectedElement;
-        var newPosition = selectedElem?.transform.position ?? Vector3.zero;
+        var newPosition = (trLookAtTarget != null) ? trLookAtTarget.transform.position : Vector3.zero;
 
         if (newPosition != trCamLookAt.transform.position) {
 
@@ -86,6 +86,10 @@ public class CameraController : MonoBehaviour {
 
             trCamLookAt.transform.position = newPosition;
         }
+    }
+
+    public void SetLookAtTarget(Transform trLookAtTarget) {
+        this.trLookAtTarget = trLookAtTarget;
     }
 
     public void ResetRotationAndZoom() {

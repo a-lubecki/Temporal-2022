@@ -57,7 +57,7 @@ public class GridPosBehavior : MonoBehaviour {
         return GridPos + OrientationFunctions.FindNextPos(orientation) * distance + Vector3.up * height;
     }
 
-    Tween DoOrientation(Vector3 nextPos, float durationSec) {
+    protected Tween DoOrientation(Vector3 nextPos, float durationSec) {
         return transform.DOLocalRotate(new Vector3(0, (int)OrientationFunctions.FindOrientation(transform.localPosition, nextPos), 0), durationSec);
     }
 

@@ -30,6 +30,9 @@ public class CharacterPawnBehavior : MonoBehaviour {
         var character = go.GetComponent<CharacterBehavior>();
         character.InitWithCharacterData(dataCharacterInChapter, GetComponentInChildren<BaseAIDecider>());
 
+        //set the pawn on the character in case some objects use the pawn location to trigger things on the level prefab
+        transform.SetParent(character.transform);
+
         return character;
     }
 

@@ -29,6 +29,8 @@ public class DataCharacter : ScriptableObject {
     [field: SerializeField] public AudioClip AudioClipMove { get; protected set; }
     [field: SerializeField] public AudioClip AudioClipClimb { get; protected set; }
     [field: SerializeField] public AudioClip AudioClipFall { get; protected set; }
+    [field: SerializeField] public AudioClip AudioClipBlasterAttack { get; protected set; }
+
 
 
     public static Dictionary<K, V> ToDictionary<K, V>(Tuple<K, V>[] tupleArray) {

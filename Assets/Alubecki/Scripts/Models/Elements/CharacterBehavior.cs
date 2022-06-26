@@ -34,6 +34,7 @@ public class CharacterBehavior : BaseElementBehavior {
     public AudioClip AudioClipMove => dataCharacterInChapter.DataCharacter.AudioClipMove;
     public AudioClip AudioClipClimb => dataCharacterInChapter.DataCharacter.AudioClipClimb;
     public AudioClip AudioClipFall => dataCharacterInChapter.DataCharacter.AudioClipFall;
+    public AudioClip AudioClipBlasterAttack => dataCharacterInChapter.DataCharacter.AudioClipBlasterAttack;
 
     public override bool IsCursorAboveElement => false;
     public override bool CanBeSelected => Team == Team.ALLY;
@@ -367,6 +368,22 @@ public class CharacterBehavior : BaseElementBehavior {
         var s = transform.DOLocalJump(transform.position, 0.1f, 3, durationSec);
 
         Game.Instance.audioManager.PlaySimpleSound(AudioClipMove);
+
+        CallOnComplete(s, onComplete);
+    }
+
+    public void Attack(Vector3 attackPos, float rotateDurationSec, Action onComplete = null) {
+
+        var s = DOTween.Sequence();
+
+        //look at if necessary
+        if (!IsOriented(attackPos)) {
+            DoOrientation(attackPos, rotateDurationSec);
+            s.AppendInterval(0.5f * rotateDurationSec);
+        }
+
+        //TODO trigger character anim
+        Game.Instance.audioManager.PlaySimpleSound(AudioClipBlasterAttack);
 
         CallOnComplete(s, onComplete);
     }

@@ -91,6 +91,9 @@ public class ElementsSelectionBehavior : MonoBehaviour {
         LastSelectedElement = SelectedElement;
         SelectedElement = selectableElem;
 
+        //center cam on the selected elem
+        Game.Instance.mainCameraController.SetLookAtTarget(SelectedElement?.transform);
+
         //play select or deselect audio
         if (canPlaySound && SelectedElement != LastSelectedElement) {
             var clip = SelectedElement != null ? audioClipSelect : audioClipDeselect;

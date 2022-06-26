@@ -5,6 +5,7 @@ public struct MementoSnapshotElement : IMementoSnapshot {
 
 
     public readonly int instanceId;
+    public readonly bool hasInvisibleMeshes;
     public readonly Vector3 localPos;
     public readonly Quaternion localRot;
     public readonly bool isDead;
@@ -13,9 +14,10 @@ public struct MementoSnapshotElement : IMementoSnapshot {
     public readonly int ageInParadox;
 
 
-    public MementoSnapshotElement(int instanceId, Vector3 localPos, Quaternion localRot, bool isDead, int age, bool isInParadoxState, int ageInParadox) {
+    public MementoSnapshotElement(int instanceId, bool hasInvisibleMeshes, Vector3 localPos, Quaternion localRot, bool isDead, int age, bool isInParadoxState, int ageInParadox) {
 
         this.instanceId = instanceId;
+        this.hasInvisibleMeshes = hasInvisibleMeshes;
         this.localPos = localPos;
         this.localRot = localRot;
         this.isDead = isDead;

@@ -329,8 +329,18 @@ public class GameManager : MonoBehaviour {
 
         HasTriggerUndoRedo = false;
 
+        var previousSelected = Game.Instance.elementsSelectionBehavior.SelectedElement;
         Game.Instance.elementsSelectionBehavior.CancelSelection(false);
+        Game.Instance.elementsSelectionBehavior.ClearLastSelected();
+
+        //override look at transform to avoid a weird camera behavior
+        Game.Instance.mainCameraController.SetLookAtTarget(previousSelected?.transform);
+
         Game.Instance.cursorBehavior.Hide();
+
+        Game.Instance.movementsSelectionBehavior.ClearNextMovement();
+
+        ComputeAndDisplayNextNPCMovementIndications();
     }
 
     void ComputeAndDisplayNextNPCMovementIndications() {

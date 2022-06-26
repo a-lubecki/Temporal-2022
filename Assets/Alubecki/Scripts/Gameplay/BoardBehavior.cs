@@ -107,7 +107,7 @@ public class BoardBehavior : MonoBehaviour, IMementoOriginator {
 
     public bool IsWalkablePos(Vector3 pos, bool canWalkOnInvisibleBlocks = false) {
 
-        if (GetElemsOnPos(pos).Any(e => !e.IsPhysicallyWalkableInBlock)) {
+        if (GetElemsOnPos(pos).Any(e => !e.IsPhysicallyWalkableInBlock && !e.IsInvisible)) {
             //must not have something on pos to walk on it
             return false;
         }
