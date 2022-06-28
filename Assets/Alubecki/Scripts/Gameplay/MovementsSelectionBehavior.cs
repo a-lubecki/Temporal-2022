@@ -18,6 +18,7 @@ public class MovementsSelectionBehavior : MonoBehaviour {
             throw new ArgumentException();
         }
 
+        //change next movement, will trigger the graph in gme manager to go to the movement resolving
         NextMovement = movement;
     }
 

@@ -29,4 +29,22 @@ public class ActionButtonsSpawnerBehavior : MonoBehaviour {
         Game.Instance.poolActionButtonGroup.DespawnAll();
     }
 
+    public BaseMovement FindDisplayedMovement<T>() where T : BaseMovement {
+
+        foreach (Transform t in transform) {
+
+            if (t.TryGetComponent<ActionButtonGroupBehavior>(out var group)) {
+
+                var movement = group.FindDisplayedMovement<T>();
+                if (movement != null) {
+                    //found a movement with correct type
+                    return movement;
+                }
+            }
+        }
+
+        //not found with the type T
+        return null;
+    }
+
 }

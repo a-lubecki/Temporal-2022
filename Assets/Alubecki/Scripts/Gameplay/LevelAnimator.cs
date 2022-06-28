@@ -41,7 +41,7 @@ public class LevelAnimator : MonoBehaviour {
         Game.Instance.audioManager.PlaySimpleSound(audioClipLevelHide);
 
         //make the board jump after delay
-        trBoard.DOLocalJump(Vector3.zero, 2, 1, 0.6f, false);
+        trBoard.DOLocalJump(Vector3.zero, 3, 1, 0.6f, false);
 
         //scale the level
         trCurrentLevel.localScale = Vector3.one;

@@ -14,54 +14,53 @@ public class AIDeciderFollow : BaseAIDecider {
             return null;
         }
 
-        var characterPos = new Vector2(character.GridPosX, character.GridPosZ);
-        var targetPos = new Vector2(trTarget.transform.position.x, trTarget.transform.position.z);
+        var targetPos = trTarget.transform.position;
 
-        if (characterPos == targetPos) {
+        var characterPos2d = new Vector2(character.GridPosX, character.GridPosZ);
+        var targetPos2d = new Vector2(targetPos.x, targetPos.z);
+
+        if (characterPos2d == targetPos2d) {
             //already on pos
             return null;
         }
 
-        //move on x and z axis, if the character can climb on jump, it will be automatically resolved
-        var possibleMovements = character.GetPossibleMovements()
-            .Where(m => m is MovementSimpleMove.Factory || m is MovementClimb.Factory || m is MovementJumpHigh.Factory);
+        var possibleMovementAggregate = character.GetPossibleMovements()
+            .FirstOrDefault(m => m is MovementAggregate.Factory);
 
-        if (possibleMovements == null || possibleMovements.Count() <= 0) {
+        if (possibleMovementAggregate == null) {
+            Debug.LogWarning("NPC doesn't have a MovementAggregate.Factory, it can't move");
             return null;
         }
 
-        var minDistance = CalculateMinDistanceToTarget(characterPos, targetPos);
-        BaseMovement bestMovement = null;
+        //init with current distance to have a first reference
+        var minDistance = float.MaxValue;
+        Vector3 bestNextPos = character.GridPos;
 
-        foreach (var possibleMovement in possibleMovements) {
+        //find closest target
+        var possibleTargets = possibleMovementAggregate.GetNextPossibleMovementTargets(character);
+        foreach (var pos in possibleTargets) {
 
-            var targets = possibleMovement.GetNextPossibleMovementTargets(character);
-            if (targets == null) {
+            //pathfinding
+            var dist = CalculateMinDistanceToTarget(new Vector2(pos.x, pos.z), targetPos2d);
+
+            if (dist > 0 && !Game.Instance.boardBehavior.IsWalkablePos(pos, character.CanMoveOverInvisibleBlocks)) {
+                //handle the MovementSimpleLookAt case, to avoid NPC looking at the target behing a wall
                 continue;
             }
 
-            foreach (var pos in targets) {
-
-                //pathfinding
-                var dist = CalculateMinDistanceToTarget(new Vector2(pos.x, pos.z), targetPos);
-                if (dist < minDistance) {
-                    minDistance = dist;
-                    bestMovement = possibleMovement.NewMovement(character, pos);
-                }
+            if (dist < minDistance) {
+                minDistance = dist;
+                bestNextPos = pos;
             }
         }
 
-        //if near and couldn't walk, look at
-        if (bestMovement == null && IsHorizontallyAdjacent(characterPos, targetPos)) {
-
-            var possibleMovementLookAt = character.GetPossibleMovements()
-                .FirstOrDefault(m => m is MovementSimpleLookAt.Factory);
-
-            var destinationPos = new Vector3(targetPos.x, character.GridPosY, targetPos.y);
-            return possibleMovementLookAt?.NewMovement(character, destinationPos);
+        if (minDistance == float.MaxValue) {
+            //no best target pos was found
+            Debug.Log("No target found for NPC follow algo");
+            return null;
         }
 
-        return bestMovement;
+        return possibleMovementAggregate.NewMovement(character, bestNextPos);
     }
 
     bool IsHorizontallyAdjacent(Vector2 origin, Vector2 target) {

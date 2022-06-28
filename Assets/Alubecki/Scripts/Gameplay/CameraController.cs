@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Cinemachine;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ public class CameraController : MonoBehaviour {
 
 
     //min time between controls inputs => avoid bugs
-    public const float DELAY_BETWEEN_MOVES_SEC = 0.2f;
+    public const float DELAY_BETWEEN_MOVES_SEC = 0.15f;
 
 
     [SerializeField] CinemachineVirtualCamera vcamDolly;
@@ -26,6 +27,7 @@ public class CameraController : MonoBehaviour {
     ZoomLevel lastZoomLevel = (ZoomLevel)(-1);//optim for LateUpdate
     float initialHorizontalDamping;
     float initialVerticalDamping;
+    bool isCamMoveDisabled;
 
     void Awake() {
 
@@ -41,6 +43,10 @@ public class CameraController : MonoBehaviour {
     }
 
     void Update() {
+
+        if (isCamMoveDisabled) {
+            return;
+        }
 
         var c = Game.Instance.inGameControlsBehavior;
 
@@ -92,21 +98,30 @@ public class CameraController : MonoBehaviour {
         this.trLookAtTarget = trLookAtTarget;
     }
 
+    void PrepareCamToMove() {
+
+        //avoid a camera bug when damping is not zero
+        vcamComposer.m_HorizontalDamping = 0;
+        vcamComposer.m_VerticalDamping = 0;
+
+        isCamMoveDisabled = true;
+
+        StartCoroutine(EnableCamMoveAfterDelay());
+    }
+
+    IEnumerator EnableCamMoveAfterDelay() {
+
+        yield return new WaitForSeconds(DELAY_BETWEEN_MOVES_SEC);
+
+        isCamMoveDisabled = false;
+    }
+
     public void ResetRotationAndZoom() {
 
         PrepareCamToMove();
 
         horizontalPosition = HorizontalPosition.SW;
         zoomLevel = ZoomLevel.DEFAULT;
-    }
-
-    void PrepareCamToMove() {
-
-        Game.Instance.inGameControlsBehavior.DisableControlsForSeconds(DELAY_BETWEEN_MOVES_SEC);
-
-        //avoid a camera bug when damping is not zero
-        vcamComposer.m_HorizontalDamping = 0;
-        vcamComposer.m_VerticalDamping = 0;
     }
 
     void RotateLeft() {

@@ -80,4 +80,18 @@ public class ActionButtonGroupBehavior : MonoBehaviour {
         Game.Instance.movementsSelectionBehavior.ValidateNextMovement(actionFar);
     }
 
+    public BaseMovement FindDisplayedMovement<T>() where T : BaseMovement {
+
+        if (actionNear != null && actionNear is T) {
+            return actionNear;
+        }
+
+        if (actionFar != null && actionFar is T) {
+            return actionFar;
+        }
+
+        //not found
+        return null;
+    }
+
 }

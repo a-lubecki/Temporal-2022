@@ -30,8 +30,6 @@ public abstract class BaseControlsBehavior : MonoBehaviour {
     public void SelectCurrentActionMap() {
 
         playerInput.SwitchCurrentActionMap(CurrentActionMapName);
-
-        //Debug.Log("Selected action map : " + CurrentActionMapName);
     }
 
     public void DisableControls() {
@@ -39,25 +37,24 @@ public abstract class BaseControlsBehavior : MonoBehaviour {
         StopCoroutineDelayEnable();
 
         playerInput.actions.Disable();
-
-        //Debug.Log("Disabled controls");
     }
 
     public void EnableControls() {
 
+        if (coroutineDelayEnable != null) {
+            //is about to enable
+            return;
+        }
+
         playerInput.actions.Enable();
-
-        //Debug.Log("Enable controls");
-    }
-
-    public void DisableControlsForSeconds(float timeSec) {
-
-        DisableControls();
-
-        coroutineDelayEnable = StartCoroutine(EnableControlsShifted(timeSec));
     }
 
     public void EnableControlsAfterDelay(float delaySec) {
+
+        if (playerInput.actions.enabled) {
+            //already enabled
+            return;
+        }
 
         StopCoroutineDelayEnable();
 
@@ -77,9 +74,9 @@ public abstract class BaseControlsBehavior : MonoBehaviour {
 
         yield return new WaitForSeconds(delaySec);
 
-        EnableControls();
-
         coroutineDelayEnable = null;
+
+        EnableControls();
     }
 
 }

@@ -46,7 +46,14 @@ public class MovementStepManager : BaseStepManager {
 
     void CancelSelection() {
 
-        Game.Instance.elementsSelectionBehavior.CancelSelection();
+        var displayedReleaseMovement = Game.Instance.actionButtonsSpawnerBehavior.FindDisplayedMovement<MovementRelease>();
+
+        //during movement stem, if the selected character is grabbing, release object instead of deselecting
+        if (displayedReleaseMovement != null) {
+            Game.Instance.movementsSelectionBehavior.ValidateNextMovement(displayedReleaseMovement);
+        } else {
+            Game.Instance.elementsSelectionBehavior.CancelSelection();
+        }
     }
 
 }

@@ -1143,7 +1143,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1249333151085435406, guid: 93b75a811dd134787ac968c0b0264abc, type: 3}
       propertyPath: realAge
-      value: 60
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 5747193295091511176, guid: 93b75a811dd134787ac968c0b0264abc, type: 3}
       propertyPath: realAge

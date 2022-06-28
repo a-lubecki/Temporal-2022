@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using UnityEngine;
 
@@ -61,15 +62,7 @@ public class CharacterBehavior : BaseElementBehavior {
     public bool IsDead => lifeStatus == LifeStatus.CORPSE || lifeStatus == LifeStatus.DEFINITELY_DEAD;
     public bool IsDefinitelyDead => lifeStatus == LifeStatus.DEFINITELY_DEAD;
 
-    protected override BaseMovement.Factory[] PossibleMovements => new BaseMovement.Factory[] {
-        new MovementSimpleLookAt.Factory(),
-        new MovementSimpleMove.Factory(),
-        new MovementClimb.Factory(),
-        new MovementJumpHigh.Factory(),
-        new MovementGrab.Factory(),
-        new MovementPushPull.Factory(),
-        new MovementRelease.Factory(),
-    };
+    protected override BaseMovement.Factory[] PossibleMovements => IsNPC ? POSSIBLE_MOVEMENTS_FOR_NPC : POSSIBLE_MOVEMENTS_FOR_PLAYER_CHARACTER;
 
     public override DisplayableCharacteristics DisplayableCharacteristics => new DisplayableCharacteristics(
         GetDisplayableColor(),
@@ -402,7 +395,33 @@ public class CharacterBehavior : BaseElementBehavior {
         UpdateCharacteristicsWithCurrentAge();
     }
 
+
+    //static array for optimization
+    static readonly BaseMovement.Factory[] POSSIBLE_MOVEMENTS_FOR_PLAYER_CHARACTER = new BaseMovement.Factory[] {
+        new MovementSimpleLookAt.Factory(),
+        new MovementSimpleMove.Factory(),
+        new MovementClimb.Factory(),
+        new MovementJumpHigh.Factory(),
+        new MovementGrab.Factory(),
+        new MovementPushPull.Factory(),
+        new MovementRelease.Factory(),
+    };
+
+    //static array for optimization
+    static readonly BaseMovement.Factory[] POSSIBLE_MOVEMENTS_FOR_NPC = new BaseMovement.Factory[] {
+        new MovementSimpleLookAt.Factory(),
+        new MovementAggregate.Factory(new BaseMovement.Factory[] {//ordered movements that NPC will try to execute if possible depending of the board context
+            new MovementAttack.Factory(),
+            new MovementSimpleMove.Factory(),
+            new MovementClimb.Factory(),
+            new MovementJumpHigh.Factory(),
+            new MovementSimpleLookAt.Factory(),
+        }),
+        //TODO add attack factory
+    };
+
 }
+
 
 public enum Team {
 

@@ -79,6 +79,7 @@ public abstract class BaseMovement {
 }
 
 public enum MovementType {
+    UNKNOWN,
     SIMPLE_MOVE,
     ORIENTATION,
     ACTION_ONE_TIME,

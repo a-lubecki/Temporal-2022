@@ -268,8 +268,6 @@ public class GameManager : MonoBehaviour {
 
         IsLevelAnimating = false;
         IsLevelShown = false;
-
-        Game.Instance.inGameControlsBehavior.EnableControls();
     }
 
     public void OnLevelFinish() {

@@ -99,16 +99,13 @@ public class ElementsSelectionBehavior : MonoBehaviour {
             var clip = SelectedElement != null ? audioClipSelect : audioClipDeselect;
             Game.Instance.audioManager.PlaySimpleSound(clip);
         }
+
+        //call deselect to release objects grabbed by characters for exemple
+        LastSelectedElement?.OnDeselect();
     }
 
     public void CancelSelection(bool canPlaySound = true) {
-
-        var previousSelectedElem = SelectedElement;
-
         ValidateSelection(null, canPlaySound);
-
-        //callback after deselect to void bug with call order
-        previousSelectedElem?.OnDeselect();
     }
 
     public void ClearLastSelected() {
