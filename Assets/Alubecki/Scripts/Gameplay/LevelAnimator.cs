@@ -8,6 +8,7 @@ public class LevelAnimator : MonoBehaviour {
 
 
     public const float DURATION_TOTAL_SEC = 1;//must be greater than the longest anims to avoid bugs
+    static readonly Vector3 SIZE_SMALL = new Vector3(0.001f, 0.001f, 0.001f);//used to avoid being zero because it can lead to bugs
 
 
     [SerializeField] AudioClip audioClipLevelShow;
@@ -30,7 +31,7 @@ public class LevelAnimator : MonoBehaviour {
             .Append(trCurrentLevel.DOLocalRotate(new Vector3(0, 0, 0), 0.7f).SetEase(Ease.OutBack));
 
         //scale the level
-        trCurrentLevel.localScale = Vector3.zero;
+        trCurrentLevel.localScale = SIZE_SMALL;
         trCurrentLevel.DOScale(Vector3.one, 0.6f).SetEase(Ease.OutBack);
 
         StartCoroutine(CallOnCompleteAfterDelay(onComplete));
@@ -45,7 +46,7 @@ public class LevelAnimator : MonoBehaviour {
 
         //scale the level
         trCurrentLevel.localScale = Vector3.one;
-        trCurrentLevel.DOScale(Vector3.zero, 0.6f).SetEase(Ease.InBack);
+        trCurrentLevel.DOScale(SIZE_SMALL, 0.6f).SetEase(Ease.InBack);
 
         StartCoroutine(CallOnCompleteAfterDelay(onComplete));
     }

@@ -82,6 +82,8 @@ public class BoardBehavior : MonoBehaviour, IMementoOriginator {
             return;
         }
 
+        //avoid seeing the level for some millis while it's destroying
+        CurrentLevel.gameObject.SetActive(false);
         GameObject.Destroy(CurrentLevel.gameObject);
 
         CurrentLevel = null;

@@ -274,7 +274,12 @@ public class GameManager : MonoBehaviour {
         Game.Instance.levelAnimator.AnimateLevelHide(
             Game.Instance.boardBehavior.transform,
             CurrentLevel.transform,
-            () => IsLevelAnimating = false
+            () => {
+
+                Game.Instance.boardBehavior.UnloadCurrentLevel();
+
+                IsLevelAnimating = false;
+            }
         );
 
         Game.Instance.temporalityManager.DeleteZones();
@@ -295,8 +300,6 @@ public class GameManager : MonoBehaviour {
     }
 
     public void OnLevelFinish() {
-
-        Game.Instance.boardBehavior.UnloadCurrentLevel();
 
         IsLevelLoaded = false;
 

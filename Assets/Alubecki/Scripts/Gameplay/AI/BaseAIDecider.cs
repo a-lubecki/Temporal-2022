@@ -16,7 +16,6 @@ public abstract class BaseAIDecider : MonoBehaviour {
     protected virtual void Awake() {
 
         IsSleeping = (waker != null);
-        
         waker?.AttachDecider(this);
     }
 
