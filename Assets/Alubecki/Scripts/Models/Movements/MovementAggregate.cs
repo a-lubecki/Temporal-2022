@@ -32,6 +32,28 @@ public class MovementAggregate : BaseMovement {
         return null;
     }
 
+    public override bool CanExecute() {
+
+        var owner = Owner;
+        if (owner == null) {
+            return false;
+        }
+
+        //try to match horizontal pos as simple move, climb and jump could be executed for the same x/z values
+        var horizontalPos = new Vector2(NextPos.x, NextPos.z);
+
+        foreach (var f in orderedFactories) {
+
+            //find a target pos matching nextPos horizontally, ex : moving, climbing, jumping have a different y
+            var targets = f.GetNextPossibleMovementTargets(owner);
+            if (targets != null && FindMatchingHorizontalPos(horizontalPos, targets, out var pos)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     protected override void ExecuteInternal(BaseElementBehavior owner, Action onComplete) {
 
         //execute the first possible executable movement
@@ -44,11 +66,7 @@ public class MovementAggregate : BaseMovement {
 
             //find a target pos matching nextPos horizontally, ex : moving, climbing, jumping have a different y
             var targets = f.GetNextPossibleMovementTargets(owner);
-            if (targets == null) {
-                continue;
-            }
-
-            if (FindMatchingHorizontalPos(horizontalPos, targets, out var pos)) {
+            if (targets != null && FindMatchingHorizontalPos(horizontalPos, targets, out var pos)) {
 
                 f.NewMovement(owner, pos).Execute(onComplete);
                 return;

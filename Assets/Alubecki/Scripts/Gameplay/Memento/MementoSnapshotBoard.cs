@@ -4,11 +4,24 @@ using System.Collections.Generic;
 
 public struct MementoSnapshotBoard : IMementoSnapshot {
 
+
     readonly HashSet<MementoSnapshotElement> elementSnapshots;
 
-    public MementoSnapshotBoard(IEnumerable<MementoSnapshotElement> elementSnapshots) {
+    public readonly int aiTeamEnemyTurnCount;
+    public readonly int aiTeamEnemyLastTurnWithMovement;
+    public readonly int aiTeamNeutralTurnCount;
+    public readonly int aiTeamNeutralLastTurnWithMovement;
+
+
+    public MementoSnapshotBoard(IEnumerable<MementoSnapshotElement> elementSnapshots, int aiTeamEnemyTurnCount, int aiTeamEnemyLastTurnWithMovement, int aiTeamNeutralTurnCount, int aiTeamNeutralLastTurnWithMovement) {
+
         //defensive copy
         this.elementSnapshots = new HashSet<MementoSnapshotElement>(elementSnapshots);
+
+        this.aiTeamEnemyTurnCount = aiTeamEnemyTurnCount;
+        this.aiTeamEnemyLastTurnWithMovement = aiTeamEnemyLastTurnWithMovement;
+        this.aiTeamNeutralTurnCount = aiTeamNeutralTurnCount;
+        this.aiTeamNeutralLastTurnWithMovement = aiTeamNeutralLastTurnWithMovement;
     }
 
     public IEnumerable<MementoSnapshotElement> GetElementsSnapshot() {

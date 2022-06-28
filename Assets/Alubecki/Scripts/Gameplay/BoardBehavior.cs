@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -77,7 +78,11 @@ public class BoardBehavior : MonoBehaviour, IMementoOriginator {
 
     public void UnloadCurrentLevel() {
 
-        GameObject.Destroy(CurrentLevel);
+        if (CurrentLevel == null) {
+            return;
+        }
+
+        GameObject.Destroy(CurrentLevel.gameObject);
 
         CurrentLevel = null;
     }
@@ -161,7 +166,13 @@ public class BoardBehavior : MonoBehaviour, IMementoOriginator {
     public IMementoSnapshot NewSnapshot() {
 
         var elemsSnapshots = GetElements().Select(e => (MementoSnapshotElement)e.NewSnapshot());
-        return new MementoSnapshotBoard(elemsSnapshots);
+        return new MementoSnapshotBoard(
+            elemsSnapshots,
+            Game.Instance.aiTeamEnemy.TurnsCount,
+            Game.Instance.aiTeamEnemy.LastTurnWithMovement,
+            Game.Instance.aiTeamNeutral.TurnsCount,
+            Game.Instance.aiTeamNeutral.LastTurnWithMovement
+        );
     }
 
     public void Restore(IMementoSnapshot snapshot) {
@@ -170,10 +181,14 @@ public class BoardBehavior : MonoBehaviour, IMementoOriginator {
             throw new ArgumentException("Wrong snapshot type, waiting for a MementoSnapshotBoard");
         }
 
-        ((MementoSnapshotBoard)snapshot).ProcessElements(
+        var s = ((MementoSnapshotBoard)snapshot);
+        s.ProcessElements(
             GetElements(),
-            (elem, snapshot) => elem.Restore(snapshot)
+            (elem, elemSnapshot) => elem.Restore(elemSnapshot)
         );
+
+        Game.Instance.aiTeamEnemy.RestoreTurnCount(s.aiTeamEnemyTurnCount, s.aiTeamEnemyLastTurnWithMovement);
+        Game.Instance.aiTeamNeutral.RestoreTurnCount(s.aiTeamNeutralTurnCount, s.aiTeamNeutralLastTurnWithMovement);
     }
 
 }

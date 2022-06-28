@@ -22,7 +22,7 @@ public class MovementResolver : MonoBehaviour {
         StartCoroutine(ResolveMovementConsequences(onComplete));
     }
 
-    public void ResolveCurrentMovement() {
+    public void ExecuteCurrentMovement() {
 
         if (IsResolvingMovement) {
             throw new InvalidOperationException("Already resolving movement");

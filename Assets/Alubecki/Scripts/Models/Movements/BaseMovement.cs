@@ -37,7 +37,7 @@ public abstract class BaseMovement {
 
     public abstract IEnumerable<DisplayableMovementInfo> NewDisplayableMovementInfos();
 
-    public bool CanExecute() {
+    public virtual bool CanExecute() {
 
         var owner = Owner;
         if (owner == null) {

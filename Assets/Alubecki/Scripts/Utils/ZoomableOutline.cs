@@ -9,6 +9,10 @@ using UnityEngine;
 public class ZoomableOutline : Outline {
 
 
+    public static bool areZoomableOutlinesEnabled = true;
+
+
+    CameraController cameraController;
     [SerializeField] float constantOutlineWidth = 1;
 
     private float lastThicknessMultiplier = -1;
@@ -17,18 +21,23 @@ public class ZoomableOutline : Outline {
 
     void LateUpdate() {
 
-        var controller = Camera.main.GetComponent<CameraController>();
-        if (controller != null) {
+        //call GetComponent in LateUpdate because Outline class doesn't have protected Awake method
+        if (cameraController == null) {
+            cameraController = Camera.main.GetComponent<CameraController>();
+        }
 
-            var multiplier = controller.GetOutlinesThicknessMultiplier();
-            if (multiplier != lastThicknessMultiplier || constantOutlineWidth != lastConstantOutlineWidth) {
+        if (cameraController == null) {
+            return;
+        }
 
-                //change original outline width (parent attribute)
-                OutlineWidth = constantOutlineWidth * multiplier;
+        var multiplier = areZoomableOutlinesEnabled ? cameraController.GetOutlinesThicknessMultiplier() : 0;
+        if (multiplier != lastThicknessMultiplier || constantOutlineWidth != lastConstantOutlineWidth) {
 
-                lastThicknessMultiplier = multiplier;
-                lastConstantOutlineWidth = constantOutlineWidth;
-            }
+            //change original outline width (parent attribute)
+            OutlineWidth = constantOutlineWidth * multiplier;
+
+            lastThicknessMultiplier = multiplier;
+            lastConstantOutlineWidth = constantOutlineWidth;
         }
     }
 

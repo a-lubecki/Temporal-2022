@@ -14,18 +14,28 @@ public class AITeamBehavior : MonoBehaviour {
     [SerializeField] float maxMovementsPerTurn = 1;//if 0.5f => 1 movement every 2 turn
     [SerializeField] int maxMovementsPerCharacter = 1;
 
-    int turnsCount;
-    int lastTurnWithMovement;
+    public int TurnsCount { get; private set; }
+    public int LastTurnWithMovement { get; private set; }
 
 
     public void InitAITeam(DataAITeam aiTeam) {
 
-        if (aiTeam == null) {
-            return;
-        }
+        TurnsCount = 0;
+        LastTurnWithMovement = 0;
 
-        maxMovementsPerTurn = aiTeam.MaxMovementsPerTurn;
-        maxMovementsPerCharacter = aiTeam.MaxMovementsPerCharacter;
+        if (aiTeam == null) {
+            maxMovementsPerTurn = 1;
+            maxMovementsPerCharacter = 1;
+        } else {
+            maxMovementsPerTurn = aiTeam.MaxMovementsPerTurn;
+            maxMovementsPerCharacter = aiTeam.MaxMovementsPerCharacter;
+        }
+    }
+
+    public void RestoreTurnCount(int turnsCount, int lastTurnWithMovement) {
+
+        this.TurnsCount = turnsCount;
+        this.LastTurnWithMovement = lastTurnWithMovement;
     }
 
     public void ComputeNextNPCsMovements() {
@@ -37,7 +47,7 @@ public class AITeamBehavior : MonoBehaviour {
             throw new InvalidOperationException("Can't prepare less than 1 movement for characters");
         }
 
-        turnsCount++;
+        TurnsCount++;
 
         orderedNPCs = Game.Instance.boardBehavior.GetElements()
             .OfType<CharacterBehavior>()
@@ -59,7 +69,7 @@ public class AITeamBehavior : MonoBehaviour {
 
             //if max per turn is 0.5 : 1/0.5 = 2 : 1 movement every 2 turns
             var turnsFrequency = 1 / maxMovementsPerTurn;
-            if (turnsCount < lastTurnWithMovement + turnsFrequency) {
+            if (TurnsCount < LastTurnWithMovement + turnsFrequency) {
                 //wait next turn
                 return;
             }
@@ -76,7 +86,7 @@ public class AITeamBehavior : MonoBehaviour {
 
             orderedNPCs[cursor].PrepareNextBestMovement();
             movementCount++;
-            lastTurnWithMovement = turnsCount;
+            LastTurnWithMovement = TurnsCount;
 
             cursor++;
 

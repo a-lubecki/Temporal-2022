@@ -89,11 +89,11 @@ public class CharacterBehavior : BaseElementBehavior {
         if (temporalAbilityBehavior != null) {
             res += "\n" + temporalAbilityBehavior.DisplayableText + "\n";
         }
-
+/* //removed for demo
         if (height == Height.SMALL) {
             res += "\n- Can go inside tight locations.";
         }
-
+*/
         if (agility == Agility.AGILE) {
             res += "\n- Can climb.";
         } else if (agility == Agility.VERY_AGILE) {

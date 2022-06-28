@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour {
     [SerializeField] AudioClip audioClipUndo;
     [SerializeField] AudioClip audioClipRedo;
 
-    public bool IsLevelLoaded => CurrentLevel != null;
+    public bool IsLevelLoaded { get; private set; }
     public LevelBehavior CurrentLevel => Game.Instance.boardBehavior.CurrentLevel;
     public int CurrentLevelNumber => CurrentLevel.LevelNumber;
     public bool IsFirstLevelOfChapter => CurrentLevel?.IsFirstLevelOfChapter ?? false;
@@ -29,6 +29,7 @@ public class GameManager : MonoBehaviour {
     public bool IsElementSelected => Game.Instance.elementsSelectionBehavior.IsElementSelected;
     public bool IsNewElementSelected => Game.Instance.elementsSelectionBehavior.IsNewElementSelected;
     public bool IsNextMovementSelected => Game.Instance.movementsSelectionBehavior.IsNextMovementSelected;
+    public bool IsNextMovementNeedResolving => Game.Instance.movementsSelectionBehavior?.NextMovement?.NeedsMovementResolving ?? false;
     public bool IsResolvingMovement => Game.Instance.movementResolver.IsResolvingMovement;
     public bool HasTriggerUndoRedo { get; private set; }
     public bool IsGameOver { get; private set; }
@@ -53,6 +54,8 @@ public class GameManager : MonoBehaviour {
         Game.Instance.panelWin.Hide();
         Game.Instance.viewGameOverBehavior.Hide();
         Game.Instance.viewChapterBehavior.Hide();
+
+        ZoomableOutline.areZoomableOutlinesEnabled = false;
     }
 
     void OnApplicationQuit() {
@@ -109,6 +112,18 @@ public class GameManager : MonoBehaviour {
 
         Game.Instance.panelLevelInfo.Show(dataChapter.ChapterName, CurrentLevelNumber);
         Game.Instance.overlayHUD.ShowFade();
+
+        //wait before setting level as loaded because the level Instantiate can slow down the level appearing animation
+        StartCoroutine(SetLevelAsLoadedAfterDelay());
+    }
+
+    IEnumerator SetLevelAsLoadedAfterDelay() {
+
+        yield return new WaitForSeconds(0.2f);
+
+        if (CurrentLevel != null) {
+            IsLevelLoaded = true;
+        }
     }
 
     public void OnShowChapter() {
@@ -139,6 +154,8 @@ public class GameManager : MonoBehaviour {
     }
 
     public void OnAnimateLevelShowEnd() {
+
+        ZoomableOutline.areZoomableOutlinesEnabled = true;
 
         Game.Instance.inGameControlsBehavior.EnableControlsAfterDelay(0.1f);
 
@@ -208,18 +225,23 @@ public class GameManager : MonoBehaviour {
 
         Game.Instance.cursorBehavior.Hide();
 
-        Game.Instance.movementResolver.ResolveCurrentMovement();
+        Game.Instance.movementResolver.ExecuteCurrentMovement();
     }
 
     public void OnMovementResolveEnd() {
 
         Game.Instance.inGameControlsBehavior.EnableControls();
 
-        Game.Instance.movementsSelectionBehavior.ClearNextMovement();
-
         Game.Instance.mementoCaretaker.SaveCurrentState();
 
         ComputeAndDisplayNextNPCMovementIndications();
+    }
+
+    public void OnMovementExecuteWithoutResolving() {
+
+        Game.Instance.cursorBehavior.Hide();
+
+        Game.Instance.movementResolver.ExecuteCurrentMovement();
     }
 
     public void OnAnimateLevelHideBegin() {
@@ -231,6 +253,8 @@ public class GameManager : MonoBehaviour {
 
         Game.Instance.elementsSelectionBehavior.CancelSelection();
         Game.Instance.inGameControlsBehavior.DisableControls();
+
+        ZoomableOutline.areZoomableOutlinesEnabled = false;
 
         IsLevelAnimating = true;
 
@@ -273,6 +297,8 @@ public class GameManager : MonoBehaviour {
     public void OnLevelFinish() {
 
         Game.Instance.boardBehavior.UnloadCurrentLevel();
+
+        IsLevelLoaded = false;
 
         //reset win camera of the previous level to move to the main dolly camera
         Game.Instance.vcamWin.Priority = 0;
