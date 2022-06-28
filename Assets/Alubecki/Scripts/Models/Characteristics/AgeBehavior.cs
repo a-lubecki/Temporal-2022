@@ -30,7 +30,7 @@ public class AgeBehavior : MonoBehaviour {
     public bool DidAgeChange => currentAge != PreviousAge;
     public bool IsAnimatingAgeChange => coroutineAnimateAgeChanges != null;
     public bool HasReachMaxAge => currentAge >= maxAge;
-    public string DisplayableText => "<b>Age:</b> " + currentAge;
+    public virtual string DisplayableText => "<b>Age:</b> " + currentAge;
     public bool AreMeshesEnabled { get; private set; }
 
 

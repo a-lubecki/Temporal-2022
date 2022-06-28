@@ -186,7 +186,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.7774436, y: 1}
+    m_SensorSize: {x: 1.7771295, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -557,7 +557,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.7774436, y: 1}
+    m_SensorSize: {x: 1.7771295, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -2517,7 +2517,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dataChapter: {fileID: 11400000, guid: 17969691958074c26a285334aa79843f, type: 2}
-  nextLevelNumberToLoad: 1
+  nextLevelNumberToLoad: 6
   audioClipWin: {fileID: 8300000, guid: 2ebdca8ec63a3437996cf8b77861be12, type: 3}
   audioClipGameOverAmbience: {fileID: 8300000, guid: 8bebf1029361747c58d1fa6551885b20, type: 3}
   audioClipUndo: {fileID: 8300000, guid: c617fecd97cd64c8b84d01837a41e619, type: 3}
@@ -4123,7 +4123,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 327210806809682183, guid: 45edb362234d449ce8cc28bcc614b2cf, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 197.58499
       objectReference: {fileID: 0}
     - target: {fileID: 327210806809682183, guid: 45edb362234d449ce8cc28bcc614b2cf, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -4143,7 +4143,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 439006371431435492, guid: 45edb362234d449ce8cc28bcc614b2cf, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 110.869995
       objectReference: {fileID: 0}
     - target: {fileID: 439006371431435492, guid: 45edb362234d449ce8cc28bcc614b2cf, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -4203,7 +4203,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2642272914601973553, guid: 45edb362234d449ce8cc28bcc614b2cf, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 183.345
       objectReference: {fileID: 0}
     - target: {fileID: 2642272914601973553, guid: 45edb362234d449ce8cc28bcc614b2cf, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -4279,7 +4279,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5853862174171123723, guid: 45edb362234d449ce8cc28bcc614b2cf, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 127.365005
       objectReference: {fileID: 0}
     - target: {fileID: 5853862174171123723, guid: 45edb362234d449ce8cc28bcc614b2cf, type: 3}
       propertyPath: m_AnchoredPosition.y

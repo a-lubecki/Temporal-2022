@@ -83,21 +83,22 @@ public class CharacterBehavior : BaseElementBehavior {
 
         res += "<b>Species:</b> " + GetTextSpeciesType() + "\n" +
             ageBehavior.DisplayableText + "\n" +
-            "<b>Status:</b> " + GetTextStatus() + "\n" +
-            weightBehavior.DisplayableText + "\n";
+            "<b>Status:</b> " + GetTextStatus() + "\n";
+        /* //removed for demo
+        res += weightBehavior.DisplayableText + "\n";*/
 
         if (temporalAbilityBehavior != null) {
             res += "\n" + temporalAbilityBehavior.DisplayableText + "\n";
         }
-/* //removed for demo
+        /* //removed for demo
         if (height == Height.SMALL) {
             res += "\n- Can go inside tight locations.";
-        }
-*/
+        }*/
+
         if (agility == Agility.AGILE) {
             res += "\n- Can climb.";
         } else if (agility == Agility.VERY_AGILE) {
-            res += "\n- Can jump far.";
+            res += "\n- Can jump high.";
         }
 
         if (strongnessBehavior.CanMove(Weight.LIGHT)) {
@@ -409,7 +410,6 @@ public class CharacterBehavior : BaseElementBehavior {
 
     //static array for optimization
     static readonly BaseMovement.Factory[] POSSIBLE_MOVEMENTS_FOR_NPC = new BaseMovement.Factory[] {
-        new MovementSimpleLookAt.Factory(),
         new MovementAggregate.Factory(new BaseMovement.Factory[] {//ordered movements that NPC will try to execute if possible depending of the board context
             new MovementAttack.Factory(),
             new MovementSimpleMove.Factory(),
@@ -417,7 +417,7 @@ public class CharacterBehavior : BaseElementBehavior {
             new MovementJumpHigh.Factory(),
             new MovementSimpleLookAt.Factory(),
         }),
-        //TODO add attack factory
+        new MovementAttack.Factory(),
     };
 
 }

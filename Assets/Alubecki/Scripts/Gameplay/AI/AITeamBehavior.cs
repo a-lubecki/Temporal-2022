@@ -38,6 +38,14 @@ public class AITeamBehavior : MonoBehaviour {
         this.LastTurnWithMovement = lastTurnWithMovement;
     }
 
+    IEnumerable<AINPCBehavior> FindAINPCBehaviors() {
+
+        return Game.Instance.boardBehavior.GetElements()
+            .OfType<CharacterBehavior>()
+            .Where(c => c.Team == team && c.TryGetComponent<AINPCBehavior>(out _))
+            .Select(c => c.GetComponent<AINPCBehavior>());
+    }
+
     public void ComputeNextNPCsMovements() {
 
         if (maxMovementsPerTurn <= 0) {
@@ -49,10 +57,7 @@ public class AITeamBehavior : MonoBehaviour {
 
         TurnsCount++;
 
-        orderedNPCs = Game.Instance.boardBehavior.GetElements()
-            .OfType<CharacterBehavior>()
-            .Where(c => c.Team == team && c.TryGetComponent<AINPCBehavior>(out _))
-            .Select(c => c.GetComponent<AINPCBehavior>())
+        orderedNPCs = FindAINPCBehaviors()
             .OrderBy(npc => npc.GetPriority())
             .ToList();
 
@@ -132,22 +137,17 @@ public class AITeamBehavior : MonoBehaviour {
         return null;
     }
 
-    public void ResetNPCAttackFlags() {
+    public void PrepareNPCsAttacks() {
 
-        foreach (var e in Game.Instance.boardBehavior.GetElements()) {
-
-            if (e.TryGetComponent<AINPCBehavior>(out var npc)) {
-                npc.ResetAttackFlag();
-            }
+        foreach (var npc in FindAINPCBehaviors()) {
+            npc.TryPreparingAttack();
         }
     }
 
-    public AINPCBehavior GetRemainingNPCWithAttack() {
+    public AINPCBehavior FindRemainingNPCWithAttack() {
 
-        return Game.Instance.boardBehavior.GetElements()
-            .OfType<CharacterBehavior>()
-            .Where(c => c.Team == team && c.TryGetComponent<AINPCBehavior>(out var npc) && npc.CanAttack())
-            .Select(c => c.GetComponent<AINPCBehavior>())
+        return FindAINPCBehaviors()
+            .Where(npc => npc.CanAttack())
             .FirstOrDefault();
     }
 

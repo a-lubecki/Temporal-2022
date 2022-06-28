@@ -110,9 +110,6 @@ public class GameManager : MonoBehaviour {
         //prepare next level for after
         nextLevelNumberToLoad++;
 
-        Game.Instance.panelLevelInfo.Show(dataChapter.ChapterName, CurrentLevelNumber);
-        Game.Instance.overlayHUD.ShowFade();
-
         //wait before setting level as loaded because the level Instantiate can slow down the level appearing animation
         StartCoroutine(SetLevelAsLoadedAfterDelay());
     }
@@ -162,6 +159,9 @@ public class GameManager : MonoBehaviour {
         Game.Instance.mementoCaretaker.SaveCurrentState();
 
         ComputeAndDisplayNextNPCMovementIndications();
+
+        Game.Instance.panelLevelInfo.Show(dataChapter.ChapterName, CurrentLevelNumber);
+        Game.Instance.overlayHUD.ShowFade();
     }
 
     public void OnSelectionStepBegin() {

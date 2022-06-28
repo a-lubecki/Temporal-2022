@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -14,8 +13,8 @@ public class AINPCBehavior : MonoBehaviour {
     [SerializeField] BaseAIDecider decider;
 
     List<BaseMovement> preparedMovements = new List<BaseMovement>();
-    Vector3 attackedPos;
-    bool didAttack;
+
+    BaseMovement preparedAttack;
 
 
     void Awake() {
@@ -65,92 +64,43 @@ public class AINPCBehavior : MonoBehaviour {
         return movement;
     }
 
-    public void ResetAttackFlag() {
-
-        didAttack = false;
-    }
-
     public bool CanAttack() {
+        return preparedAttack != null;
+    }
 
-        if (didAttack) {
-            //can't do several attacks
+    public bool TryPreparingAttack() {
+
+        preparedAttack = null;
+
+        var possibleMovement = characterBehavior.GetPossibleMovements()
+            .OfType<MovementAttack.Factory>()
+            .FirstOrDefault();
+
+        if (possibleMovement == null) {
+            //no attack movement
             return false;
         }
 
-        if (characterBehavior.IsInvisible) {
-            //can't attack if not on the board
+        var possibleTargets = possibleMovement.GetNextPossibleMovementTargets(characterBehavior);
+        if (possibleTargets == null || possibleTargets.Count() <= 0) {
+            //no target pos with another character to attack
             return false;
         }
 
-        if (!characterBehavior.IsEnemy) {
-            //temporary test for demo: only enemy can attack
-            return false;
-        }
+        preparedAttack = possibleMovement?.NewMovement(characterBehavior, possibleTargets.First());
 
-        //attack on the pos, over the pos and under the pos
-        var pos = GetAttackPos();
-
-        attackedPos = pos;
-        if (GetCharactersOnAttackPos(attackedPos).Count() > 0) {
-            return true;
-        }
-
-        attackedPos = pos + Vector3.up;
-        if (GetCharactersOnAttackPos(attackedPos).Count() > 0) {
-            return true;
-        }
-
-        attackedPos = pos + Vector3.down;
-        if (GetCharactersOnAttackPos(attackedPos).Count() > 0) {
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
-    Vector3 GetAttackPos() => characterBehavior.Orientation switch {
+    public void TryExecuteAttack(Action onComplete) {
 
-        Orientation.North => characterBehavior.GridPos + Vector3.forward,
-        Orientation.East => characterBehavior.GridPos + Vector3.right,
-        Orientation.South => characterBehavior.GridPos + Vector3.back,
-        Orientation.West => characterBehavior.GridPos + Vector3.left,
-        _ => throw new NotImplementedException()
-    };
-
-    IEnumerable<CharacterBehavior> GetCharactersOnAttackPos(Vector3 pos) {
-
-        return Game.Instance.boardBehavior.GetElemsOnPos(pos)
-            .OfType<CharacterBehavior>()
-            .Where(c => !c.IsInvisible && IsAttackMatrixSatisfied(characterBehavior.Team, c.Team));
-    }
-
-    bool IsAttackMatrixSatisfied(Team attacker, Team attacked) {
-
-        return attacker == Team.ALLY && attacked == Team.ENEMY ||
-            attacker == Team.NEUTRAL && attacked == Team.ENEMY ||
-            attacker == Team.ENEMY && attacked == Team.ALLY ||
-            attacker == Team.ENEMY && attacked == Team.NEUTRAL;
-    }
-
-    public IEnumerator Attack() {
-
-        didAttack = true;
-
-        var pos = GetAttackPos();
-        var isAnimating = true;
-
-        characterBehavior.Attack(
-            pos,
-            MovementSimpleMove.DURATION_ANIM_AUTOROTATE_SEC,
-            () => isAnimating = false
-        );
-
-        yield return new WaitWhile(() => isAnimating);
-
-        //resolve attacked characters
-        foreach (var c in GetCharactersOnAttackPos(attackedPos)) {
-            c.SetAsDead();
+        if (preparedAttack == null) {
+            return;
         }
+
+        preparedAttack?.Execute(onComplete);
+
+        preparedAttack = null;
     }
 
 }

@@ -187,14 +187,16 @@ public class MovementResolver : MonoBehaviour {
 
     IEnumerator ResolveNPCsAttacks(AITeamBehavior aiTeam) {
 
-        //reset attack flags before launching algo, flag is useful to avoid infinite algo in certain cases
-        aiTeam.ResetNPCAttackFlags();
+        aiTeam.PrepareNPCsAttacks();
 
         //resolve attacks, it can lead to game over
-        var attackingNPC = aiTeam.GetRemainingNPCWithAttack();
+        var attackingNPC = aiTeam.FindRemainingNPCWithAttack();
         while (attackingNPC != null) {
 
-            yield return attackingNPC.Attack();
+            var isAttacking = true;
+            attackingNPC.TryExecuteAttack(() => isAttacking = false);
+
+            yield return new WaitWhile(() => isAttacking);
 
             if (IsAnyPlayerCharacterDefinitelyDead()) {
                 //stop now, game over will be triggered outside this method
@@ -202,7 +204,7 @@ public class MovementResolver : MonoBehaviour {
                 yield break;
             }
 
-            attackingNPC = aiTeam.GetRemainingNPCWithAttack();
+            attackingNPC = aiTeam.FindRemainingNPCWithAttack();
         }
     }
 

@@ -17,6 +17,16 @@ public class AgeParadoxBehavior : AgeBehavior {
     public bool IsInParadoxState { get; private set; }
     public int ParadoxAge { get; private set; }
 
+    public override string DisplayableText => base.DisplayableText + GetParadoxAgeText();
+
+    string GetParadoxAgeText() {
+
+        if (!IsInParadoxState) {
+            return "";
+        }
+
+        return "\n<size=80%>Is in a <u>paradox</u> state because a temporal zone prevents it from turning " + ParadoxAge + ".</size>";
+    }
 
     protected override void Awake() {
         base.Awake();

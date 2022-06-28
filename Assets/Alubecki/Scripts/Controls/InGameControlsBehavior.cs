@@ -65,6 +65,9 @@ public class InGameControlsBehavior : BaseControlsBehavior {
         } else if (value.y > 0) {
             MustZoom = true;
         }
+
+        //emulate pointer move to reset cursor if mouse doesn't change position
+        MustNavigatePointer = true;
     }
 
     //callback from PlayerInput
@@ -109,7 +112,7 @@ public class InGameControlsBehavior : BaseControlsBehavior {
 
     //callback from PlayerInput
     void OnPreviousNextMovement(InputValue v) {
-        
+
         MustGoToPreviousNextMovement = true;
         IsPreviousMovement = (v.Get<float>() < 0);
     }

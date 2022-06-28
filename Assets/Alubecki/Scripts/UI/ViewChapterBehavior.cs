@@ -14,7 +14,7 @@ public class ViewChapterBehavior : BaseViewOverlay {
         textChapterName.text = dataChapter.ChapterName;
         textChapterStory.text = dataChapter.TextChapterStory;
 
-        Show();
+        ShowFade();
     }
 
     public void OnButtonStartClick() {

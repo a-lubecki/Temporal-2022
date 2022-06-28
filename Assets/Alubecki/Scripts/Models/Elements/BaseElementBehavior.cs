@@ -95,7 +95,21 @@ public abstract class BaseElementBehavior : GridPosBehavior, IMementoOriginator 
         transform.localPosition = s.localPos;
         transform.localRotation = s.localRot;
 
-        GetComponent<AgeBehavior>()?.InitCurrentAge(s.age);
+        //set age and paradox
+        if (TryGetComponent<AgeBehavior>(out var ageBehavior)) {
+
+            ageBehavior.InitCurrentAge(s.age);
+
+            var ageParadoxBehavior = ageBehavior as AgeParadoxBehavior;
+            if (ageParadoxBehavior != null) {
+
+                ageParadoxBehavior.ClearParadoxState();
+
+                if (s.isInParadoxState) {
+                    ageParadoxBehavior.ShowParadoxMesh(s.ageInParadox);
+                }
+            }
+        }
 
         RestoreInternal(s);
     }
