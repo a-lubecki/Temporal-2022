@@ -34,6 +34,3 @@ New block types can be added in the future to diversify the gameplay: water, lav
   - optimisations / balancing
   
 
-### How I made the game
-
-https://sites.google.com/view/alubecki-lead-developer/my-portfolio/temporal
